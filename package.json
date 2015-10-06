@@ -1,6 +1,6 @@
 {
   "name": "mbed-connector",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node.js wrapper for mbed Connector REST calls",
   "main": "index",
   "repository": {
