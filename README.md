@@ -99,44 +99,48 @@ var credentials = {
   - `asyncResponseHandler` - function that is called anytime an async-response is received through the webhook, **but only if requestCallback is not overriden (see above)**. The function is passed an asyncResponse object. See the mbed Device Connector Service documentation for the format of the asyncResponse object.
 
 
-### MbedConnector.createWebhook(url, callback[, options])
+### .createWebhook(url, callback[, options])
 
 Create a webhook. This allows the mbed Device Connector Service to push updates to your application.
 
 - `url` - URL where the mbed Device Connector Service should PUT updates
 
-### MbedConnector.registerPreSubscription(preSubscriptionData, callback[, options])
+### .startLongPolling(callback[, options])
+
+Start continuous long polling for notifications. This can be used instead of a webhook so an app can run from a publicly-unreachable machine (eg locally or behind a firewall).
+
+### .registerPreSubscription(preSubscriptionData, callback[, options])
 
 Configure the relevant subscriptions
 
 - `preSubscriptionData` - Object detailing the subscriptions. See the mbed Device Connector Service documentation for more information.
 
-### MbedConnector.subscribeToResource(endpoint, resource, callback[, options])
+### .subscribeToResource(endpoint, resource, callback[, options])
 
 Subscribe to an endpoint's resource.
 
 - `endpoint` - name of the endpoint
 - `resource` - full path of the resource (ex. "/Object/0/Resource")
 
-### MbedConnector.getSubscriptionsForResource(endpoint, resource, callback[, options])
+### .getSubscriptionsForResource(endpoint, resource, callback[, options])
 
 Get the subscriptions to an endpoint's resource.
 
 - `endpoint` - name of the endpoint
 - `resource` - full path of the resource (ex. "/Object/0/Resource")
 
-### MbedConnector.getEndpoints(callback[, options])
+### .getEndpoints(callback[, options])
 
 Get a list of the endpoints.
 
-### MbedConnector.getResource(endpoint, resource, callback[, options])
+### .getResource(endpoint, resource, callback[, options])
 
 Get the value of an endpoint's resource.
 
 - `endpoint` - name of the endpoint
 - `resource` - full path of the resource (ex. "/Object/0/Resource")
 
-### MbedConnector.putResource(endpoint, resource, value, callback[, options])
+### .putResource(endpoint, resource, value, callback[, options])
 
 Set the value of an endpoint's resource.
 
@@ -146,18 +150,18 @@ Set the value of an endpoint's resource.
 
 ## Events
 
-### MbedConnector.on('registrations', callback)
+### .on('registrations', callback)
 
 Event triggered when new endpoints register. The callback is passed an array of all the new endpoints. See the mbed Device Connector Service documentation for more information on the format of the data passed by the "registrations" notification.
 
-### MbedConnector.on('de-registrations', callback)
+### .on('de-registrations', callback)
 
 Event triggered when endpoints de-register. The callback is passed an array of all the names of the de-registered endpoints.
 
-### MbedConnector.on('reg-updates', callback)
+### .on('reg-updates', callback)
 
 Event triggered when endpoints re-register. The callback is passed an array of all the re-registered endpoints. See the mbed Device Connector Service documentation for more information on the format of the data passed by the "reg-updates" notification.
 
-### MbedConnector.on('notifications', callback)
+### .on('notifications', callback)
 
 Event triggered on new notifications. The callback is passed an array of all the new notifications. See the mbed Device Connector Service documentation for more information on the format of the data passed by the "notifcations" notification.
