@@ -11,8 +11,16 @@
     "name": "Brian Daniels",
     "email": "brian.daniels@arm.com"
   },
+  "scripts": {
+    "test": "mocha test/test-unit.js",
+    "test-external": "mocha test/test.js"
+  },
   "dependencies": {
     "request": "^2.34.0",
     "url-join": "0.0.1"
+  },
+  "devDependencies": {
+    "dotenv": "^1.2.0",
+    "mocha": "^2.3.4"
   }
 }
