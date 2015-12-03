@@ -1,3 +1,5 @@
+var child_process = require('child_process');
+
 var ClientManager = function(clientPath) {
   this.childProcess = null;
   this.currentStart = null;
@@ -31,7 +33,7 @@ ClientManager.prototype.stopClient = function(callback, signal) {
   }
 }
 
-ClientManager.prototype.getRegistrationsEventHandler = function() {
+ClientManager.prototype.getRegistrationsEventHandler = function(endpointName) {
   var _this = this;
 
   return function(registrations) {
@@ -47,7 +49,7 @@ ClientManager.prototype.getRegistrationsEventHandler = function() {
   }
 }
 
-ClientManager.prototype.getDeRegistrationsEventHandler = function() {
+ClientManager.prototype.getDeRegistrationsEventHandler = function(endpointName) {
   var _this = this;
 
   return function(deRegistrations) {

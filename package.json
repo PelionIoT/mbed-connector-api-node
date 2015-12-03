@@ -12,8 +12,8 @@
     "email": "brian.daniels@arm.com"
   },
   "scripts": {
-    "test": "mocha --grep '-Client' --invert",
-    "test-with-client": "mocha"
+    "test": "mocha test/test-unit.js",
+    "test-external": "mocha test/test.js"
   },
   "dependencies": {
     "request": "^2.34.0",
