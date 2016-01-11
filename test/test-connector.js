@@ -24,10 +24,10 @@ mbedConnector = new MbedConnector({
 });
 
 module.exports = function(mock) {
+  require('./general')(mbedConnector, mock);
   require('./endpoints')(mbedConnector, mock);
-  //require('./subscriptions', mbedConnector, mock);
-  //require('./notification', mbedConnector, mock);
-  require('./misc')(mbedConnector, mock);
+  require('./notifications')(mbedConnector, mock);
+  require('./subscriptions')(mbedConnector, mock);
 }
 
 

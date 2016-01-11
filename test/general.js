@@ -17,7 +17,11 @@ var config = {
 }
 
 module.exports = function(mbedConnector, mock) {
-  describe('Misc', function() {
+  describe('General', function() {
+    if (!mock) {
+      this.timeout(10000);
+    }
+
     describe('#MbedConnector', function() {
       it('should set the appropriate variables in the constructor', function() {
         assert.strictEqual(mbedConnector.options.host, host);
@@ -34,7 +38,7 @@ module.exports = function(mbedConnector, mock) {
                     .get('/limits')
                     .reply(200, {
                       'transaction-quota': 10000,
-                      'transaction-count': 7845, 
+                      'transaction-count': 7845,
                       'endpoint-quota': 100,
                       'endpoint-count': 50
                     });

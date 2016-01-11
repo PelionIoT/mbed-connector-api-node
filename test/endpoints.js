@@ -17,6 +17,10 @@ var config = {
 
 module.exports = function(mbedConnector, mock) {
   describe('Endpoints', function() {
+    if (!mock) {
+      this.timeout(10000);
+    }
+
     before(function() {
       mbedConnector.removeAllListeners();
     });
@@ -95,7 +99,7 @@ module.exports = function(mbedConnector, mock) {
       mbedConnector.getResourceValue(endpointName, resourceName, function(error, value) {
         assert(!error);
         assert(util.isNumber(value));
-        assert(value > 0);
+        assert(value >= 0);
         done();
       });
     };
@@ -108,10 +112,16 @@ module.exports = function(mbedConnector, mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .get(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200, 1);
+        } else {
+          mbedConnector.startLongPolling();
         }
       });
 
-      it('should get resource value (when a value is directly returned)', getResourceValueTest);
+      after(function() {
+        mbedConnector.stopLongPolling();
+      });
+
+      it('should get resource value', getResourceValueTest);
     });
 
     if (mock) {
@@ -163,7 +173,7 @@ module.exports = function(mbedConnector, mock) {
 
     var putResourceValueTest = function(done) {
       mbedConnector.putResourceValue(endpointName, resourceName, 1, function(error, value) {
-        assert(!error);
+        assert(!error, String(error));
         done();
       });
     };
@@ -176,7 +186,13 @@ module.exports = function(mbedConnector, mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .put(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200);
+        } else {
+          mbedConnector.startLongPolling();
         }
+      });
+
+      after(function() {
+        mbedConnector.stopLongPolling();
       });
 
       it("should put a resource's value", putResourceValueTest);
@@ -230,7 +246,7 @@ module.exports = function(mbedConnector, mock) {
 
     var postResourceTest = function(done) {
       mbedConnector.postResource(endpointName, resourceName, null, function(error, value) {
-        assert(!error);
+        assert(!error, String(error));
         done();
       });
     };
@@ -243,7 +259,13 @@ module.exports = function(mbedConnector, mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .post(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200);
+        } else {
+          mbedConnector.startLongPolling();
         }
+      });
+
+      after(function() {
+        mbedConnector.stopLongPolling();
       });
 
       it("should post a resource", postResourceTest);
@@ -297,7 +319,7 @@ module.exports = function(mbedConnector, mock) {
 
     var deleteEndpointTest = function(done) {
       mbedConnector.deleteEndpoint(endpointName, function(error, value) {
-        assert(!error);
+        assert(!error, String(error));
         done();
       });
     };
@@ -310,8 +332,14 @@ module.exports = function(mbedConnector, mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .delete(urljoin('/endpoints', endpointName))
                     .reply(200);
-        }
-      });
+          } else {
+            mbedConnector.startLongPolling();
+          }
+        });
+
+        after(function() {
+          mbedConnector.stopLongPolling();
+        });
 
       it("should delete an endpoint", deleteEndpointTest);
     });
