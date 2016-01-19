@@ -68,5 +68,69 @@ module.exports = function(mbedConnector, mock) {
         });
       });
     });
+
+    describe('#getApiVersion', function() {
+      var mockApi;
+
+      before(function() {
+        if (mock) {
+          mockApi = nock(mbedConnector.options.host, config)
+                    .get('/')
+                    .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
+        }
+      });
+
+      it('should get the current API version', function(done) {
+        mbedConnector.getApiVersion(function(error, apiVersion) {
+          assert(!error);
+          assert(util.isString(apiVersion));
+          done();
+        });
+      });
+    });
+
+    describe('#getApiVersions', function() {
+      var mockApi;
+      var restApiVersions = [
+        'v1',
+        'v2'
+      ];
+
+      before(function() {
+        if (mock) {
+          mockApi = nock(mbedConnector.options.host, config)
+                    .get('/rest-versions')
+                    .reply(200, restApiVersions);
+        }
+      });
+
+      it('should get the current API version', function(done) {
+        mbedConnector.getApiVersions(function(error, apiVersions) {
+          assert(!error);
+          assert(util.isArray(apiVersions));
+          done();
+        });
+      });
+    });
+
+    describe('#getConnectorVersion', function() {
+      var mockApi;
+
+      before(function() {
+        if (mock) {
+          mockApi = nock(mbedConnector.options.host, config)
+                    .get('/')
+                    .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
+        }
+      });
+
+      it('should get the current Connector version', function(done) {
+        mbedConnector.getConnectorVersion(function(error, connectorVersion) {
+          assert(!error);
+          assert(util.isString(connectorVersion));
+          done();
+        });
+      });
+    });
   });
 };
