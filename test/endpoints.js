@@ -3,11 +3,14 @@ var urljoin = require('url-join');
 var assert = require('assert');
 var util = require('util');
 
+var ClientManager = require('./client-manager');
+
 require('dotenv').load({silent: true});
 
 var accessKey = process.env.ACCESS_KEY
 var endpointName = process.env.ENDPOINT_NAME
 var resourceName = process.env.RESOURCE_NAME
+var clientPath = process.env.CLIENT_PATH;
 
 var config = {
   reqheaders: {
@@ -15,18 +18,32 @@ var config = {
   }
 }
 
+var clientManager = new ClientManager(clientPath, {printDebug: true});
+
 module.exports = function(mbedConnector, mock) {
   describe('Endpoints', function() {
     if (!mock) {
-      this.timeout(10000);
+      this.timeout(30000);
     }
 
-    before(function() {
+    before(function(done) {
       mbedConnector.removeAllListeners();
+
+      if (mock) {
+        done();
+      } else {
+        clientManager.startClient(done);
+      }
     });
 
-    after(function() {
+    after(function(done) {
       mbedConnector.stopLongPolling();
+
+      if (mock) {
+        done();
+      } else {
+        clientManager.stopClient(done);
+      }
     });
 
     describe('#getEndpoints', function() {
@@ -97,9 +114,9 @@ module.exports = function(mbedConnector, mock) {
 
     var getResourceValueTest = function(done){
       mbedConnector.getResourceValue(endpointName, resourceName, function(error, value) {
-        assert(!error);
-        assert(util.isNumber(value));
-        assert(value >= 0);
+        assert(!error, String(error));
+        assert(util.isString(value));
+        assert(parseInt(value) >= 0);
         done();
       });
     };
@@ -107,13 +124,16 @@ module.exports = function(mbedConnector, mock) {
     describe('#getResourceValue', function() {
       var mockApi;
 
-      before(function() {
+      before(function(done) {
         if (mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .get(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200, 1);
+
+          done();
         } else {
           mbedConnector.startLongPolling();
+          setTimeout(done, 1000);
         }
       });
 
@@ -121,7 +141,7 @@ module.exports = function(mbedConnector, mock) {
         mbedConnector.stopLongPolling();
       });
 
-      it('should get resource value', getResourceValueTest);
+      it('should get a resource value', getResourceValueTest);
     });
 
     if (mock) {
@@ -167,7 +187,7 @@ module.exports = function(mbedConnector, mock) {
           nock.cleanAll();
         });
 
-        it('should get resource value (after first receiving an async response)', getResourceValueTest);
+        it('should get a resource value (after first receiving an async response)', getResourceValueTest);
       });
     }
 
@@ -181,13 +201,16 @@ module.exports = function(mbedConnector, mock) {
     describe('#putResourceValue', function() {
       var mockApi;
 
-      before(function() {
+      before(function(done) {
         if (mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .put(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200);
+
+          done();
         } else {
           mbedConnector.startLongPolling();
+          setTimeout(done, 1000);
         }
       });
 
@@ -254,13 +277,16 @@ module.exports = function(mbedConnector, mock) {
     describe('#postResource', function() {
       var mockApi;
 
-      before(function() {
+      before(function(done) {
         if (mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .post(urljoin('/endpoints', endpointName, resourceName))
                     .reply(200);
+
+          done();
         } else {
           mbedConnector.startLongPolling();
+          setTimeout(done, 1000);
         }
       });
 
@@ -327,19 +353,22 @@ module.exports = function(mbedConnector, mock) {
     describe('#deleteEndpoint', function() {
       var mockApi;
 
-      before(function() {
+      before(function(done) {
         if (mock) {
           mockApi = nock(mbedConnector.options.host, config)
                     .delete(urljoin('/endpoints', endpointName))
                     .reply(200);
-          } else {
-            mbedConnector.startLongPolling();
-          }
-        });
 
-        after(function() {
-          mbedConnector.stopLongPolling();
-        });
+          done();
+        } else {
+          mbedConnector.startLongPolling();
+          setTimeout(done, 1000);
+        }
+      });
+
+      after(function() {
+        mbedConnector.stopLongPolling();
+      });
 
       it("should delete an endpoint", deleteEndpointTest);
     });
