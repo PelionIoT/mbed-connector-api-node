@@ -74,7 +74,7 @@ module.exports = function(mbedConnector, mock) {
         before(function() {
           mockApi = nock(mbedConnector.options.host, config)
                     .put(urljoin('/subscriptions', endpointName, resourceName))
-                    .reply(200, 1);
+                    .reply(200);
         });
       } else {
         after(function(done) {
@@ -221,6 +221,87 @@ module.exports = function(mbedConnector, mock) {
 
       it("should delete all subscriptions for an endpoint", function(done) {
         mbedConnector.deleteAllSubscriptions(done);
+      });
+    });
+
+    describe('#getPreSubscription', function() {
+      var mockApi;
+
+      var preSubscriptionData = [
+        {
+          "endpoint-name": endpointName
+        }
+      ];
+
+      var curPreSubscriptionData;
+
+      before(function(done) {
+        if (mock) {
+          mockApi = nock(mbedConnector.options.host, config)
+                    .put(urljoin('/subscriptions'))
+                    .reply(function(uri, requestBody) {
+                      curPreSubscriptionData = JSON.parse(requestBody)
+                      return [200, ''];
+                    })
+                    .get(urljoin('/subscriptions'))
+                    .reply(function(uri, requestBody) {
+                      return [200, JSON.stringify(curPreSubscriptionData)];
+                    });
+        }
+
+        mbedConnector.putPreSubscription(preSubscriptionData, done);
+      });
+
+      if (!mock) {
+        after(function(done) {
+          mbedConnector.putPreSubscription([], done);
+        });
+      }
+
+      it("should get pre subscription data", function(done) {
+        mbedConnector.getPreSubscription(function(error, returnedPreSubscriptionData) {
+          assert(!error, String(error));
+          assert.deepEqual(returnedPreSubscriptionData, preSubscriptionData);
+          done();
+        });
+      });
+    });
+
+    describe('#putPreSubscription', function() {
+      var mockApi;
+
+      var preSubscriptionData = [
+        {
+          "endpoint-name": endpointName
+        }
+      ];
+
+      if (mock) {
+        before(function() {
+          mockApi = nock(mbedConnector.options.host, config)
+                    .put(urljoin('/subscriptions'))
+                    .reply(function(uri, requestBody) {
+                      try {
+                        assert.deepEqual(JSON.parse(requestBody), preSubscriptionData);
+                        return [200, ''];
+                      } catch(e) {
+                        // Note: the body here does not mimic mbed Connector
+                        // This is intended to be a hint as to why the mocked
+                        // api test failed
+                        return [400, 'Incorrect data received'];
+                      }
+                    });
+        });
+      }
+
+      if (!mock) {
+        after(function(done) {
+          mbedConnector.putPreSubscription([], done);
+        });
+      }
+
+      it("should put presubscription data", function(done) {
+        mbedConnector.putPreSubscription(preSubscriptionData, done);
       });
     });
   });
