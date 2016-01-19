@@ -23,6 +23,7 @@
   "devDependencies": {
     "dotenv": "^1.2.0",
     "mocha": "^2.3.4",
-    "nock": "^5.2.1"
+    "nock": "^5.2.1",
+    "pty.js": "^0.3.0"
   }
 }
