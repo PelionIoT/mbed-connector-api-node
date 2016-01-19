@@ -14,7 +14,8 @@
   "scripts": {
     "test": "mocha test/test-mock.js",
     "test-external-longpoll": "mocha test/test-external-longpoll.js",
-    "test-external-callback": "mocha test/test-external-callback.js"
+    "test-external-callback": "mocha test/test-external-callback.js",
+    "docs": "jsdox --output docs lib"
   },
   "dependencies": {
     "extend": "^3.0.0",
@@ -25,6 +26,7 @@
     "dotenv": "^1.2.0",
     "mocha": "^2.3.4",
     "nock": "^5.2.1",
-    "pty.js": "^0.3.0"
+    "pty.js": "^0.3.0",
+    "jsdox": "^0.4.9"
   }
 }
