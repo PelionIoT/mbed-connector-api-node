@@ -20,7 +20,7 @@ var config = {
 
 var clientManager = new ClientManager(clientPath, {printDebug: true});
 
-module.exports = function(mbedConnector, mock) {
+module.exports = function(mbedConnector, mock, useCallback) {
   describe('Endpoints', function() {
     if (!mock) {
       this.timeout(30000);

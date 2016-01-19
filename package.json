@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "mocha test/test-mock.js",
-    "test-external": "mocha test/test-external.js"
+    "test-external-longpoll": "mocha test/test-external-longpoll.js",
+    "test-external-callback": "mocha test/test-external-callback.js"
   },
   "dependencies": {
     "extend": "^3.0.0",

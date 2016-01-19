@@ -23,11 +23,11 @@ mbedConnector = new MbedConnector({
   accessKey: accessKey
 });
 
-module.exports = function(mock) {
-  require('./general')(mbedConnector, mock);
-  require('./endpoints')(mbedConnector, mock);
-  require('./notifications')(mbedConnector, mock);
-  require('./subscriptions')(mbedConnector, mock);
+module.exports = function(mock, useCallback) {
+  require('./general')(mbedConnector, mock, useCallback);
+  require('./endpoints')(mbedConnector, mock, useCallback);
+  require('./notifications')(mbedConnector, mock, useCallback);
+  require('./subscriptions')(mbedConnector, mock, useCallback);
 }
 
 

@@ -16,7 +16,7 @@ var config = {
   }
 }
 
-module.exports = function(mbedConnector, mock) {
+module.exports = function(mbedConnector, mock, useCallback) {
   describe('General', function() {
     if (!mock) {
       this.timeout(10000);

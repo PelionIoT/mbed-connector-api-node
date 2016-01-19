@@ -21,7 +21,7 @@ var config = {
 
 var clientManager = new ClientManager(clientPath);
 
-module.exports = function(mbedConnector, mock) {
+module.exports = function(mbedConnector, mock, useCallback) {
   describe('Notifications', function() {
     if (!mock) {
       this.timeout(10000);
