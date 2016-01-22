@@ -3,105 +3,91 @@ var urljoin = require('url-join');
 var assert = require('assert');
 var util = require('util');
 
-var ClientManager = require('./client-manager');
+var MockHelper = require('./mock-helper');
 
-require('dotenv').load({silent: true});
+module.exports = function(mbedConnector, config) {
+  if (config.useCallback) {
+    describe('Notifications', function() {
+      if (!config.mock) {
+        this.timeout(10000);
+      }
 
-var accessKey = process.env.ACCESS_KEY;
-var endpointName = process.env.ENDPOINT_NAME;
-var resourceName = process.env.RESOURCE_NAME;
-var clientPath = process.env.CLIENT_PATH;
-var callbackUrl = process.env.CALLBACK_URL || 'http://example.com/callback';
+      describe('#getCallback', function() {
+        var mockApi;
+        before(function(done) {
+          if (config.mock) {
+            mockApi = nock(config.host, config.nockConfig)
+                      .get(urljoin('/notification', 'callback'))
+                      .reply(200, { url: config.callbackUrl })
+                      .put(urljoin('/notification', 'callback'))
+                      .reply(204);
+          }
 
-var config = {
-  reqheaders: {
-    'Authorization': 'Bearer ' + accessKey
+          mbedConnector.putCallback(config.callbackUrl, done);
+        });
+
+        if (!config.mock) {
+          after(function(done) {
+            mbedConnector.deleteCallback(done);
+          });
+        }
+
+        it('should get the current callback data', function(done) {
+          mbedConnector.getCallback(function(error, callbackData) {
+            assert(!error);
+            assert(util.isObject(callbackData));
+            assert.strictEqual(callbackData.url, config.callbackUrl);
+            done();
+          });
+        });
+      });
+
+      describe('#setCallback', function() {
+        var mockApi;
+
+        if (config.mock) {
+          before(function() {
+            mockApi = nock(config.host, config.nockConfig)
+                      .put(urljoin('/notification', 'callback'))
+                      .reply(204);
+          });
+        }
+
+        if (!config.mock) {
+          after(function(done) {
+            mbedConnector.deleteCallback(done);
+          });
+        }
+
+        it('should put the new callback data', function(done) {
+          mbedConnector.putCallback(config.callbackUrl, done);
+        });
+      });
+
+      describe('#deleteCallback', function() {
+        var mockApi;
+
+        before(function(done) {
+          if (config.mock) {
+            mockApi = nock(config.host, config.nockConfig)
+                    .put(urljoin('/notification', 'callback'))
+                    .reply(204)
+                    .delete(urljoin('/notification', 'callback'))
+                    .reply(204);
+          }
+
+          mbedConnector.putCallback(config.callbackUrl, done);
+        });
+
+        it('should delete the current callback data', function(done) {
+          mbedConnector.deleteCallback(done);
+        });
+      });
+    });
   }
-};
-
-var clientManager = new ClientManager(clientPath);
-
-module.exports = function(mbedConnector, mock, useCallback) {
-  describe('Notifications', function() {
-    if (!mock) {
-      this.timeout(10000);
-    }
-
-    describe('#getCallback', function() {
-      var mockApi;
-      before(function(done) {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
-                    .get(urljoin('/notification', 'callback'))
-                    .reply(200, { url: callbackUrl })
-                    .put(urljoin('/notification', 'callback'))
-                    .reply(204);
-        }
-
-        mbedConnector.putCallback(callbackUrl, done);
-      });
-
-      if (!mock) {
-        after(function(done) {
-          mbedConnector.deleteCallback(done);
-        });
-      }
-
-      it('should get the current callback data', function(done) {
-        mbedConnector.getCallback(function(error, callbackData) {
-          assert(!error);
-          assert(util.isObject(callbackData));
-          assert.strictEqual(callbackData.url, callbackUrl);
-          done();
-        });
-      });
-    });
-
-    describe('#setCallback', function() {
-      var mockApi;
-
-      if (mock) {
-        before(function() {
-          mockApi = nock(mbedConnector.options.host, config)
-                    .put(urljoin('/notification', 'callback'))
-                    .reply(204);
-        });
-      }
-
-      if (!mock) {
-        after(function(done) {
-          mbedConnector.deleteCallback(done);
-        });
-      }
-
-      it('should get the current callback data', function(done) {
-        mbedConnector.putCallback(callbackUrl, done);
-      });
-    });
-
-    describe('#deleteCallback', function() {
-      var mockApi;
-
-      before(function(done) {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
-                  .put(urljoin('/notification', 'callback'))
-                  .reply(204)
-                  .delete(urljoin('/notification', 'callback'))
-                  .reply(204);
-        }
-
-        mbedConnector.putCallback(callbackUrl, done);
-      });
-
-      it('should get the current callback data', function(done) {
-        mbedConnector.deleteCallback(done);
-      });
-    });
-  });
 
   describe('Handle-Notifications', function() {
-    if (!mock) {
+    if (!config.mock) {
       this.timeout(30000);
     }
 
@@ -121,18 +107,19 @@ module.exports = function(mbedConnector, mock, useCallback) {
       var mockApi;
 
       before(function(done) {
-        if (mock) {
+        if (config.mock) {
           var longPollCb;
-          mockApi = nock(mbedConnector.options.host, config)
-                    .put(urljoin('/subscriptions', endpointName, resourceName))
-                    .reply(200)
-                    .delete(urljoin('/subscriptions', endpointName, resourceName))
-                    .reply(204)
-                    .persist()
-                    .get(urljoin('/notification', 'pull'))
-                    .reply(function(uri, requestBody, cb) {
-                      longPollCb = cb;
-                    });
+          mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
+          mockApi.put(urljoin('/subscriptions', config.endpointName, config.resourceName))
+                  .reply(200)
+                  .delete(urljoin('/subscriptions', config.endpointName, config.resourceName))
+                  .reply(204)
+                  .persist()
+                  .get(urljoin('/notification', 'pull'))
+                  .query({ noWait: false })
+                  .reply(function(uri, requestBody, cb) {
+                    longPollCb = cb;
+                  });
 
           setTimeout(function() {
             longPollCb(null, [
@@ -140,8 +127,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
               {
                 "notifications": [
                   {
-                    "ep": endpointName,
-                    "path": resourceName,
+                    "ep": config.endpointName,
+                    "path": config.resourceName,
                     "payload": "MQ=="
                   }
                 ]
@@ -150,30 +137,30 @@ module.exports = function(mbedConnector, mock, useCallback) {
           }, 500);
         }
 
-        mbedConnector.startLongPolling();
+        mbedConnector.startLongPolling(function(error) {
+          assert(!error, String(error));
 
-        if (mock) {
-          mbedConnector.putResourceSubscription(endpointName, resourceName, done);
-        } else {
-          clientManager.startClient(function() {
-            mbedConnector.putResourceSubscription(endpointName, resourceName, done);
-          });
-        }
+          if (config.mock) {
+            mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+          } else {
+            config.clientManager.startClient(function() {
+              mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+            });
+          }
+        });
       });
 
       after(function(done) {
-        mbedConnector.deleteResourceSubscription(endpointName, resourceName, function(error) {
+        mbedConnector.deleteResourceSubscription(config.endpointName, config.resourceName, function(error) {
           assert(!error, String(error));
 
           mbedConnector.stopLongPolling();
 
-          if (mock) {
+          if (config.mock) {
             nock.cleanAll();
             done();
           } else {
-            clientManager.stopClient(function() {
-              done();
-            });
+            config.clientManager.stopClient(done);
           }
         });
       });
@@ -186,7 +173,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
           assert(notifications.length > 0);
 
           notifications.forEach(function(notification) {
-            if (notification.ep === endpointName && notification.path === resourceName) {
+            if (notification.ep === config.endpointName && notification.path === config.resourceName) {
               assert(notification.payload >= 0);
               foundEndpoint = true;
             }
@@ -202,15 +189,16 @@ module.exports = function(mbedConnector, mock, useCallback) {
     describe('registrations', function() {
       var mockApi;
 
-      before(function() {
-        if (mock) {
+      before(function(done) {
+        if (config.mock) {
           var longPollCb;
-          mockApi = nock(mbedConnector.options.host, config)
-                    .persist()
-                    .get(urljoin('/notification', 'pull'))
-                    .reply(function(uri, requestBody, cb) {
-                      longPollCb = cb;
-                    });
+          mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
+          mockApi.persist()
+                  .get(urljoin('/notification', 'pull'))
+                  .query({ noWait: false })
+                  .reply(function(uri, requestBody, cb) {
+                    longPollCb = cb;
+                  });
 
           setTimeout(function() {
             // In reality, the "registrations" object is more complex, but we're
@@ -220,7 +208,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
               {
                 "registrations": [
                   {
-                    "ep": endpointName
+                    "ep": config.endpointName
                   }
                 ]
               }
@@ -228,13 +216,13 @@ module.exports = function(mbedConnector, mock, useCallback) {
           }, 500);
         }
 
-        mbedConnector.startLongPolling();
+        mbedConnector.startLongPolling(done);
       });
 
       after(function() {
         mbedConnector.stopLongPolling();
 
-        if (mock) {
+        if (config.mock) {
           nock.cleanAll();
         }
       });
@@ -247,7 +235,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
           assert(registrations.length > 0);
 
           registrations.forEach(function(registration) {
-            if (registration.ep === endpointName) {
+            if (registration.ep === config.endpointName) {
               foundEndpoint = true;
             }
           });
@@ -257,8 +245,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
           done();
         });
 
-        if (!mock) {
-          clientManager.startClient();
+        if (!config.mock) {
+          config.clientManager.startClient();
         }
       });
     });
@@ -268,15 +256,16 @@ module.exports = function(mbedConnector, mock, useCallback) {
 
       this.timeout(120000);
 
-      before(function() {
-        if (mock) {
+      before(function(done) {
+        if (config.mock) {
           var longPollCb;
-          mockApi = nock(mbedConnector.options.host, config)
-                    .persist()
-                    .get(urljoin('/notification', 'pull'))
-                    .reply(function(uri, requestBody, cb) {
-                      longPollCb = cb;
-                    });
+          mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
+          mockApi.persist()
+                  .get(urljoin('/notification', 'pull'))
+                  .query({ noWait: false })
+                  .reply(function(uri, requestBody, cb) {
+                    longPollCb = cb;
+                  });
 
           setTimeout(function() {
             // In reality, the "reg-updates" object is more complex, but we're
@@ -286,7 +275,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
               {
                 "reg-updates": [
                   {
-                    "ep": endpointName
+                    "ep": config.endpointName
                   }
                 ]
               }
@@ -294,13 +283,13 @@ module.exports = function(mbedConnector, mock, useCallback) {
           }, 500);
         }
 
-        mbedConnector.startLongPolling();
+        mbedConnector.startLongPolling(done);
       });
 
       after(function() {
         mbedConnector.stopLongPolling();
 
-        if (mock) {
+        if (config.mock) {
           nock.cleanAll();
         }
       });
@@ -313,7 +302,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
           assert(regUpdates.length > 0);
 
           regUpdates.forEach(function(regUpdate) {
-            if (regUpdate.ep === endpointName) {
+            if (regUpdate.ep === config.endpointName) {
               foundEndpoint = true;
             }
           });
@@ -329,40 +318,43 @@ module.exports = function(mbedConnector, mock, useCallback) {
       var mockApi;
 
       before(function(done) {
-        if (mock) {
+        if (config.mock) {
           var longPollCb;
-          mockApi = nock(mbedConnector.options.host, config)
-                    .persist()
-                    .get(urljoin('/notification', 'pull'))
-                    .reply(function(uri, requestBody, cb) {
-                      longPollCb = cb;
-                    });
+          mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
+          mockApi.persist()
+                  .get(urljoin('/notification', 'pull'))
+                  .query({ noWait: false })
+                  .reply(function(uri, requestBody, cb) {
+                    longPollCb = cb;
+                  });
 
           setTimeout(function() {
             longPollCb(null, [
               200,
               {
                 "de-registrations": [
-                  endpointName
+                  config.endpointName
                 ]
               }
             ]);
           }, 500);
         }
 
-        mbedConnector.startLongPolling();
+        mbedConnector.startLongPolling(function(error) {
+          assert(!error, String(error));
 
-        if (mock) {
-          done();
-        } else {
-          clientManager.startClient(done);
-        }
+          if (config.mock) {
+            done();
+          } else {
+            config.clientManager.startClient(done);
+          }
+        });
       });
 
       after(function() {
         mbedConnector.stopLongPolling();
 
-        if (mock) {
+        if (config.mock) {
           nock.cleanAll();
         }
       });
@@ -371,12 +363,12 @@ module.exports = function(mbedConnector, mock, useCallback) {
         mbedConnector.on('de-registrations', function(deRegistrations) {
           assert(util.isArray(deRegistrations));
           assert(deRegistrations.length > 0);
-          assert(deRegistrations.indexOf(endpointName) > -1);
+          assert(deRegistrations.indexOf(config.endpointName) > -1);
           done();
         });
 
-        if (!mock) {
-          clientManager.stopClient();
+        if (!config.mock) {
+          config.clientManager.stopClient();
         }
       });
     });
@@ -387,40 +379,41 @@ module.exports = function(mbedConnector, mock, useCallback) {
       this.timeout(120000);
 
       before(function(done) {
-        if (mock) {
+        if (config.mock) {
           var longPollCb;
-          mockApi = nock(mbedConnector.options.host, config)
-                    .persist()
-                    .get(urljoin('/notification', 'pull'))
-                    .reply(function(uri, requestBody, cb) {
-                      setTimeout(function() {
-                        cb(null, [
-                          200,
-                          {
-                            "registrations-expired": [
-                              endpointName
-                            ]
-                          }
-                        ]);
-                      }, 500);
-                    });
-
-
+          mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
+          mockApi.persist()
+                  .get(urljoin('/notification', 'pull'))
+                  .query({ noWait: false })
+                  .reply(function(uri, requestBody, cb) {
+                    setTimeout(function() {
+                      cb(null, [
+                        200,
+                        {
+                          "registrations-expired": [
+                            config.endpointName
+                          ]
+                        }
+                      ]);
+                    }, 500);
+                  });
         }
 
-        mbedConnector.startLongPolling();
+        mbedConnector.startLongPolling(function(error) {
+          assert(!error, String(error));
 
-        if (mock) {
-          done();
-        } else {
-          clientManager.startClient(done);
-        }
+          if (config.mock) {
+            done();
+          } else {
+            config.clientManager.startClient(done);
+          }
+        });
       });
 
       after(function() {
         mbedConnector.stopLongPolling();
 
-        if (mock) {
+        if (config.mock) {
           nock.cleanAll();
         }
       });
@@ -429,12 +422,12 @@ module.exports = function(mbedConnector, mock, useCallback) {
         mbedConnector.on('registrations-expired', function(registrationsExpired) {
           assert(util.isArray(registrationsExpired));
           assert(registrationsExpired.length > 0);
-          assert(registrationsExpired.indexOf(endpointName) > -1);
+          assert(registrationsExpired.indexOf(config.endpointName) > -1);
           done();
         });
 
-        if (!mock) {
-          clientManager.stopClient();
+        if (!config.mock) {
+          config.clientManager.stopClient();
         }
       });
     });

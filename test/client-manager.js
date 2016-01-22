@@ -18,7 +18,9 @@ ClientManager.prototype.startClient = function(callback, options) {
 
       if ((outputText.indexOf('Registered') > -1) && !started) {
         started = true;
-        callback();
+        if (callback) {
+          callback();
+        }
       }
     });
   });

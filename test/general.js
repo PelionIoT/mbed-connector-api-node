@@ -3,29 +3,16 @@ var urljoin = require('url-join');
 var assert = require('assert');
 var util = require('util');
 
-require('dotenv').load({silent: true});
-
-var host = process.env.host || 'https://api.connector.mbed.com';
-var accessKey = process.env.ACCESS_KEY
-var endpointName = process.env.ENDPOINT_NAME
-var resourceName = process.env.RESOURCE_NAME
-
-var config = {
-  reqheaders: {
-    'Authorization': 'Bearer ' + accessKey
-  }
-}
-
-module.exports = function(mbedConnector, mock, useCallback) {
+module.exports = function(mbedConnector, config) {
   describe('General', function() {
-    if (!mock) {
+    if (!config.mock) {
       this.timeout(10000);
     }
 
     describe('#MbedConnector', function() {
       it('should set the appropriate variables in the constructor', function() {
-        assert.strictEqual(mbedConnector.options.host, host);
-        assert.strictEqual(mbedConnector.options.accessKey, accessKey);
+        assert.strictEqual(mbedConnector.options.host, config.host);
+        assert.strictEqual(mbedConnector.options.accessKey, config.accessKey);
       });
     });
 
@@ -33,8 +20,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
       var mockApi;
 
       before(function() {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
+        if (config.mock) {
+          mockApi = nock(config.host, config.nockConfig)
                     .get('/limits')
                     .reply(200, {
                       'transaction-quota': 10000,
@@ -47,7 +34,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
 
       it('should return the traffic limits', function(done) {
         mbedConnector.getLimits(function(error, limits) {
-          assert(!error);
+          assert(!error, String(error));
           assert('transaction-quota' in limits);
           assert(util.isNumber(limits['transaction-quota']));
           assert.strictEqual(limits['transaction-quota'], 10000);
@@ -73,8 +60,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
       var mockApi;
 
       before(function() {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
+        if (config.mock) {
+          mockApi = nock(config.host, config.nockConfig)
                     .get('/')
                     .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
         }
@@ -82,7 +69,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
 
       it('should get the current API version', function(done) {
         mbedConnector.getApiVersion(function(error, apiVersion) {
-          assert(!error);
+          assert(!error, String(error));
           assert(util.isString(apiVersion));
           done();
         });
@@ -97,8 +84,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
       ];
 
       before(function() {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
+        if (config.mock) {
+          mockApi = nock(config.host, config.nockConfig)
                     .get('/rest-versions')
                     .reply(200, restApiVersions);
         }
@@ -106,7 +93,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
 
       it('should get the current API version', function(done) {
         mbedConnector.getApiVersions(function(error, apiVersions) {
-          assert(!error);
+          assert(!error, String(error));
           assert(util.isArray(apiVersions));
           done();
         });
@@ -117,8 +104,8 @@ module.exports = function(mbedConnector, mock, useCallback) {
       var mockApi;
 
       before(function() {
-        if (mock) {
-          mockApi = nock(mbedConnector.options.host, config)
+        if (config.mock) {
+          mockApi = nock(config.host, config.nockConfig)
                     .get('/')
                     .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
         }
@@ -126,7 +113,7 @@ module.exports = function(mbedConnector, mock, useCallback) {
 
       it('should get the current Connector version', function(done) {
         mbedConnector.getConnectorVersion(function(error, connectorVersion) {
-          assert(!error);
+          assert(!error, String(error));
           assert(util.isString(connectorVersion));
           done();
         });
