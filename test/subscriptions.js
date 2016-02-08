@@ -245,7 +245,12 @@ module.exports = function(mbedConnector, config) {
           mockApi = nock(config.host, config.nockConfig)
                     .put(urljoin('/subscriptions'))
                     .reply(function(uri, requestBody) {
-                      curPreSubscriptionData = JSON.parse(requestBody)
+                      if (util.isString(requestBody)) {
+                        curPreSubscriptionData = JSON.parse(requestBody);
+                      } else {
+                        curPreSubscriptionData = requestBody;
+                      }
+
                       return [200, ''];
                     })
                     .get(urljoin('/subscriptions'))
@@ -287,7 +292,10 @@ module.exports = function(mbedConnector, config) {
                     .put(urljoin('/subscriptions'))
                     .reply(function(uri, requestBody) {
                       try {
-                        assert.deepEqual(JSON.parse(requestBody), preSubscriptionData);
+                        if (util.isString(requestBody)) {
+                          requestBody = JSON.parse(requestBody);
+                        }
+                        assert.deepEqual(requestBody, preSubscriptionData);
                         return [200, ''];
                       } catch(e) {
                         // Note: the body here does not mimic mbed Connector
