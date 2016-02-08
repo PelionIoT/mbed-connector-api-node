@@ -307,9 +307,9 @@ module.exports = function(mbedConnector, config) {
             }
           });
 
-          assert(foundEndpoint);
-
-          done();
+          if (foundEndpoint) {
+            done();
+          }
         });
       });
     });
@@ -427,7 +427,8 @@ module.exports = function(mbedConnector, config) {
         });
 
         if (!config.mock) {
-          config.clientManager.stopClient();
+          // SIGTERM signal used to ensure no de-register message is sent to Connector
+          config.clientManager.stopClient(null, 'SIGTERM');
         }
       });
     });

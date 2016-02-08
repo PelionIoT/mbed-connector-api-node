@@ -52,8 +52,13 @@ module.exports = function(mbedConnector, config) {
         mbedConnector.getEndpoints(function(error, endpoints) {
           assert(!error);
           assert(util.isArray(endpoints));
-          assert.strictEqual(endpoints.length, 1);
-          assert.strictEqual(endpoints[0].name, config.endpointName);
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
           done();
         });
       });

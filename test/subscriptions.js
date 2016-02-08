@@ -8,7 +8,7 @@ var MockHelper = require('./mock-helper');
 module.exports = function(mbedConnector, config) {
   describe('Subscriptions', function() {
     if (!config.mock) {
-      this.timeout(10000);
+      this.timeout(30000);
     }
 
     before(function(done) {
@@ -40,9 +40,13 @@ module.exports = function(mbedConnector, config) {
                     .reply(200)
                     .get(urljoin('/subscriptions', config.endpointName, config.resourceName))
                     .reply(200);
-        }
 
-        mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+          mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+        } else {
+          mbedConnector.startLongPolling(function() {
+            mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+          })
+        }
       });
 
       if (!config.mock) {
