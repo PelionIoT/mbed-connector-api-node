@@ -31,3 +31,6 @@ npm-debug.log
 node_modules
 .env
 .idea/
+
+test/bin/mbed-client-linux-example
+test/bin/security.h
