@@ -32,5 +32,5 @@ node_modules
 .env
 .idea/
 
-test/bin/mbed-client-linux-example
-test/bin/security.h
+test/bin
+!test/bin/security.h.enc
