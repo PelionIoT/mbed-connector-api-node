@@ -1,6 +1,9 @@
 language: node_js
 node_js:
   - stable
+script:
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then ./test/build_linux_client.sh; fi
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then npm run-script test-external-longpoll; else npm test; fi
 env:
   - CXX=g++-4.8
 addons:
