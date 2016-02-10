@@ -22,7 +22,7 @@ module.exports = function(mbedConnector, config) {
       before(function() {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .get('/limits')
+                    .get(urljoin('/', mbedConnector.options.restApiVersion, '/limits'))
                     .reply(200, {
                       'transaction-quota': 10000,
                       'transaction-count': 7845,
@@ -56,26 +56,6 @@ module.exports = function(mbedConnector, config) {
       });
     });
 
-    describe('#getApiVersion', function() {
-      var mockApi;
-
-      before(function() {
-        if (config.mock) {
-          mockApi = nock(config.host, config.nockConfig)
-                    .get('/')
-                    .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
-        }
-      });
-
-      it('should get the current API version', function(done) {
-        mbedConnector.getApiVersion(function(error, apiVersion) {
-          assert(!error, String(error));
-          assert(util.isString(apiVersion));
-          done();
-        });
-      });
-    });
-
     describe('#getApiVersions', function() {
       var mockApi;
       var restApiVersions = [
@@ -86,7 +66,7 @@ module.exports = function(mbedConnector, config) {
       before(function() {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .get('/rest-versions')
+                    .get(urljoin('/', 'rest-versions'))
                     .reply(200, restApiVersions);
         }
       });

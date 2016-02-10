@@ -17,9 +17,9 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
-                      .get(urljoin('/notification', 'callback'))
+                      .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'callback'))
                       .reply(200, { url: config.callbackUrl })
-                      .put(urljoin('/notification', 'callback'))
+                      .put(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'callback'))
                       .reply(204);
           }
 
@@ -48,7 +48,7 @@ module.exports = function(mbedConnector, config) {
         if (config.mock) {
           before(function() {
             mockApi = nock(config.host, config.nockConfig)
-                      .put(urljoin('/notification', 'callback'))
+                      .put(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'callback'))
                       .reply(204);
           });
         }
@@ -70,9 +70,9 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/notification', 'callback'))
+                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'callback'))
                     .reply(204)
-                    .delete(urljoin('/notification', 'callback'))
+                    .delete(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'callback'))
                     .reply(204);
           }
 
@@ -110,16 +110,19 @@ module.exports = function(mbedConnector, config) {
         if (config.mock) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.put(urljoin('/subscriptions', config.endpointName, config.resourceName))
+          mockApi.put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                   .reply(200)
-                  .delete(urljoin('/subscriptions', config.endpointName, config.resourceName))
+                  .delete(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                   .reply(204)
                   .persist()
-                  .get(urljoin('/notification', 'pull'))
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
-                  });
+                  })
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .query({ noWait: true })
+                  .reply(204);
 
           setTimeout(function() {
             longPollCb(null, [
@@ -194,11 +197,14 @@ module.exports = function(mbedConnector, config) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.persist()
-                  .get(urljoin('/notification', 'pull'))
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
-                  });
+                  })
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .query({ noWait: true })
+                  .reply(204);
 
           setTimeout(function() {
             // In reality, the "registrations" object is more complex, but we're
@@ -261,11 +267,14 @@ module.exports = function(mbedConnector, config) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.persist()
-                  .get(urljoin('/notification', 'pull'))
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
-                  });
+                  })
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .query({ noWait: true })
+                  .reply(204);
 
           setTimeout(function() {
             // In reality, the "reg-updates" object is more complex, but we're
@@ -322,11 +331,14 @@ module.exports = function(mbedConnector, config) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.persist()
-                  .get(urljoin('/notification', 'pull'))
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
-                  });
+                  })
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .query({ noWait: true })
+                  .reply(204);
 
           setTimeout(function() {
             longPollCb(null, [
@@ -383,7 +395,7 @@ module.exports = function(mbedConnector, config) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.persist()
-                  .get(urljoin('/notification', 'pull'))
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     setTimeout(function() {
@@ -396,7 +408,10 @@ module.exports = function(mbedConnector, config) {
                         }
                       ]);
                     }, 500);
-                  });
+                  })
+                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .query({ noWait: true })
+                  .reply(204);
         }
 
         mbedConnector.startLongPolling(function(error) {
