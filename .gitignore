@@ -33,4 +33,3 @@ node_modules
 .idea/
 
 test/bin
-!test/bin/security.h.enc

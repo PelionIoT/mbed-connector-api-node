@@ -1,14 +1,26 @@
 language: node_js
 node_js:
   - stable
+install:
+  - npm install
+  # Install all yotta dependencies if running integration tests
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then sudo apt-get update && sudo apt-get install python-setuptools cmake build-essential ninja-build python-dev libffi-dev libssl-dev && sudo easy_install pip; fi
+  # Install yotta
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then sudo pip install yotta; fi
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then cmake --version; fi
 script:
-  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then ./test/build_linux_client.sh; fi
+  # If running integration tests, build an mbed linux client
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then ./test/ci/build_linux_client.sh; fi
+  # Run the integration tests or run the mocking tests
   - if [ $TRAVIS_PULL_REQUEST == "false" ]; then npm run-script test-external-longpoll; else npm test; fi
 env:
   - CXX=g++-4.8
 addons:
   apt:
     sources:
+      - george-edison55-precise-backports
       - ubuntu-toolchain-r-test
     packages:
+      - cmake
+      - cmake-data
       - g++-4.8
