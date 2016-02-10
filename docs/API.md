@@ -16,7 +16,7 @@
     * [.getCallback(callback, [options])](#mbedConnector+getCallback)
     * [.putCallback(data, callback, [options])](#mbedConnector+putCallback)
     * [.deleteCallback(callback, [options])](#mbedConnector+deleteCallback)
-    * [.startLongPolling([options])](#mbedConnector+startLongPolling)
+    * [.startLongPolling(callback, [options])](#mbedConnector+startLongPolling)
     * [.stopLongPolling()](#mbedConnector+stopLongPolling)
     * [.getResourceSubscription(endpoint, resource, callback, [options])](#mbedConnector+getResourceSubscription)
     * [.putResourceSubscription(endpoint, resource, callback, [options])](#mbedConnector+putResourceSubscription)
@@ -192,13 +192,14 @@ notifications)
 | [options] | <code>Object</code> | Optional options object |
 
 <a name="mbedConnector+startLongPolling"></a>
-### mbedConnector.startLongPolling([options])
+### mbedConnector.startLongPolling(callback, [options])
 Begins long polling constantly for notifications
 
 **Kind**: instance method of <code>[mbedConnector](#mbedConnector)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
+| callback | <code>function</code> | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> | Optional options object |
 
 <a name="mbedConnector+stopLongPolling"></a>
