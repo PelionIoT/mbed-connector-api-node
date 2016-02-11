@@ -1,6 +1,7 @@
 <a name="mbedConnector"></a>
 ## mbedConnector
 **Kind**: global class  
+**Emits**: <code>[notifications](#mbedConnector+event_notifications)</code>, <code>[registrations](#mbedConnector+event_registrations)</code>, <code>[reg-updates](#mbedConnector+event_reg-updates)</code>, <code>[de-registrations](#mbedConnector+event_de-registrations)</code>, <code>[registrations-expired](#mbedConnector+event_registrations-expired)</code>  
 
 * [mbedConnector](#mbedConnector)
     * [new mbedConnector([options])](#new_mbedConnector_new)
@@ -26,6 +27,11 @@
     * [.deleteAllSubscriptions(callback)](#mbedConnector+deleteAllSubscriptions)
     * [.getPreSubscription(callback, [options])](#mbedConnector+getPreSubscription)
     * [.putPreSubscription(data, callback, [options])](#mbedConnector+putPreSubscription)
+    * ["notifications"](#mbedConnector+event_notifications)
+    * ["registrations"](#mbedConnector+event_registrations)
+    * ["reg-updates"](#mbedConnector+event_reg-updates)
+    * ["de-registrations"](#mbedConnector+event_de-registrations)
+    * ["registrations-expired"](#mbedConnector+event_registrations-expired)
 
 <a name="new_mbedConnector_new"></a>
 ### new mbedConnector([options])
@@ -302,4 +308,59 @@ PUTs pre-subscription data
 | data | <code>Object</code> | The pre-subscription data |
 | callback | <code>function</code> | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> | Optional options object |
+
+<a name="mbedConnector+event_notifications"></a>
+### "notifications"
+Resource notifications event.
+
+**Kind**: event emitted by <code>[mbedConnector](#mbedConnector)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| notifications | <code>Array.&lt;Object&gt;</code> | An array of notification objects |
+
+<a name="mbedConnector+event_registrations"></a>
+### "registrations"
+Endpoint registrations event.
+
+**Kind**: event emitted by <code>[mbedConnector](#mbedConnector)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| registrations | <code>Array.&lt;Object&gt;</code> | An array of registration objects |
+
+<a name="mbedConnector+event_reg-updates"></a>
+### "reg-updates"
+Endpoint registration updates event.
+
+**Kind**: event emitted by <code>[mbedConnector](#mbedConnector)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| regUpdates | <code>Array.&lt;Object&gt;</code> | An array of registration update objects |
+
+<a name="mbedConnector+event_de-registrations"></a>
+### "de-registrations"
+Endpoint de-registrations event.
+
+**Kind**: event emitted by <code>[mbedConnector](#mbedConnector)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| deRegistrations | <code>Array.&lt;Object&gt;</code> | An array of de-registration objects |
+
+<a name="mbedConnector+event_registrations-expired"></a>
+### "registrations-expired"
+Endpoint registration expirations event.
+
+**Kind**: event emitted by <code>[mbedConnector](#mbedConnector)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| registrationsExpired | <code>Array.&lt;Object&gt;</code> | An array of registration expirations objects |
 
