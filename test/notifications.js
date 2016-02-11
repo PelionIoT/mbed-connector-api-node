@@ -388,7 +388,7 @@ module.exports = function(mbedConnector, config) {
     describe('registrations-expired', function() {
       var mockApi;
 
-      this.timeout(120000);
+      this.timeout(200000);
 
       before(function(done) {
         if (config.mock) {
