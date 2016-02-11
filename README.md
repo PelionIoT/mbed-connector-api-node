@@ -17,7 +17,7 @@ var MbedConnector = require('mbed-connector');
 var mbedConnector = new MbedConnector({
   accessKey: /* Access Key */
 });
-mbedConenctor.getEndpoints(function(error, endpoints) {
+mbedConnector.getEndpoints(function(error, endpoints) {
   if (error) throw error;
   console.log('Endpoints:', endpoints);
 });
@@ -31,7 +31,7 @@ var MbedConnector = require('mbed-connector');
 var mbedConnector = new MbedConnector({
   accessKey: /* Access Key */
 });
-mbedConenctor.getResources('test-endpoint', function(error, resources) {
+mbedConnector.getResources('test-endpoint', function(error, resources) {
   if (error) throw error;
   console.log('Resources:', resources);
 });
@@ -49,7 +49,7 @@ var mbedConnector = new MbedConnector({
 });
 mbedConnector.startLongPolling(function(error) {
   if (error) throw error;
-  mbedConenctor.getResourceValue('test-endpoint', '/Test/0/D', function(error, value) {
+  mbedConnector.getResourceValue('test-endpoint', '/Test/0/D', function(error, value) {
     if (error) throw error;
     console.log('Value:', value);
   });
