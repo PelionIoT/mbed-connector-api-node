@@ -14,7 +14,6 @@ ClientManager.prototype.startClient = function(callback, options) {
     _this.childProcess = pty.spawn(_this.clientPath);
 
     _this.childProcess.stdout.on('data', function(data) {
-      console.log('DATA:', data.toString());
       outputText += data.toString();
 
       if ((outputText.indexOf('Registered') > -1) && !started) {
