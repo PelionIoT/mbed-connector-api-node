@@ -266,36 +266,36 @@ module.exports = function(mbedConnector, config) {
       });
     }
 
-    var postResourceTest = function(done) {
-      mbedConnector.postResource(config.endpointName, config.resourceName, null, function(error, value) {
-        assert(!error, String(error));
-        done();
-      });
-    };
-
-    describe('#postResource', function() {
-      var mockApi;
-
-      before(function(done) {
-        if (config.mock) {
-          mockApi = nock(config.host, config.nockConfig)
-                    .post(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
-                    .reply(200);
-
-          done();
-        } else {
-          mbedConnector.startLongPolling(done);
-        }
-      });
-
-      after(function() {
-        mbedConnector.stopLongPolling();
-      });
-
-      it("should post a resource", postResourceTest);
-    });
-
     if (config.mock) {
+      var postResourceTest = function(done) {
+        mbedConnector.postResource(config.endpointName, config.resourceName, null, function(error, value) {
+          assert(!error, String(error));
+          done();
+        });
+      };
+
+      describe('#postResource', function() {
+        var mockApi;
+
+        before(function(done) {
+          if (config.mock) {
+            mockApi = nock(config.host, config.nockConfig)
+                      .post(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+                      .reply(200);
+
+            done();
+          } else {
+            mbedConnector.startLongPolling(done);
+          }
+        });
+
+        after(function() {
+          mbedConnector.stopLongPolling();
+        });
+
+        it("should post a resource", postResourceTest);
+      });
+
       describe('#postResource (async-response)', function() {
         var mockApi;
 
@@ -347,36 +347,36 @@ module.exports = function(mbedConnector, config) {
       });
     }
 
-    var deleteEndpointTest = function(done) {
-      mbedConnector.deleteEndpoint(config.endpointName, function(error, value) {
-        assert(!error, String(error));
-        done();
-      });
-    };
-
-    describe('#deleteEndpoint', function() {
-      var mockApi;
-
-      before(function(done) {
-        if (config.mock) {
-          mockApi = nock(config.host, config.nockConfig)
-                    .delete(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName))
-                    .reply(200);
-
-          done();
-        } else {
-          mbedConnector.startLongPolling(done);
-        }
-      });
-
-      after(function() {
-        mbedConnector.stopLongPolling();
-      });
-
-      it("should delete an endpoint", deleteEndpointTest);
-    });
-
     if (config.mock) {
+      var deleteEndpointTest = function(done) {
+        mbedConnector.deleteEndpoint(config.endpointName, function(error, value) {
+          assert(!error, String(error));
+          done();
+        });
+      };
+
+      describe('#deleteEndpoint', function() {
+        var mockApi;
+
+        before(function(done) {
+          if (config.mock) {
+            mockApi = nock(config.host, config.nockConfig)
+                      .delete(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName))
+                      .reply(200);
+
+            done();
+          } else {
+            mbedConnector.startLongPolling(done);
+          }
+        });
+
+        after(function() {
+          mbedConnector.stopLongPolling();
+        });
+
+        it("should delete an endpoint", deleteEndpointTest);
+      });
+
       describe('#deleteEndpoint (async-response)', function() {
         var mockApi;
 
@@ -410,7 +410,7 @@ module.exports = function(mbedConnector, config) {
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
-                  
+
           mockApi.persist()
                   .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
