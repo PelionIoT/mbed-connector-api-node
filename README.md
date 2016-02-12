@@ -84,4 +84,41 @@ mbedConnector.startLongPolling(function(error) {
 });
 ```
 
+## Testing
+There are two types of tests that are available in this library: **mocking** and **integration** tests.
+
+### Mocking Tests
+Mocking tests can be ran with the following command:
+
+```
+npm test
+```
+
+These tests mock the expected results from mbed Device Connector. This allows you to run the test offline and without any endpoints setup. **Before any PRs are accepted on this repository, you must pass the mocking tests.**
+
+### Integration Tests
+The integration tests can be ran with the following command:
+
+```
+npm run-script test-external-longpoll
+```
+
+These tests will use an mbed linux client to perform "end to end" testing with mbed Device Connector.
+
+#### mbed Linux Client
+
+You will need a built mbed linux client to run integration tests. You can use the [mbed-client-linux-example](https://github.com/ARMmbed/mbed-client-linux-example) project.
+
+#### Environment Setup
+Running these tests require a number of environment variables to be setup. These can be set in your shell or in a `.env` file in the root of the project. The following variables are **required** to be set:
+
+- ACCESS_KEY - An access key for your mbed Device Connector account
+- ENDPOINT_NAME - The name of the mbed linux client you built. This can be found in your `security.h` file
+- RESOURCE_NAME - The path to an observable resource on your client. For the [mbed-client-linux-example](https://github.com/ARMmbed/mbed-client-linux-example), this would be `/Test/0/D`
+- CLIENT_PATH - The path to your compiled mbed linux client executable (see the above section)
+
+The following variables are also available for optional configuration:
+
+- HOST - The URL to the mbed Device Connector API. Defaults to `https://api.connector.mbed.com`.
+
 
