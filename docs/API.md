@@ -4,7 +4,7 @@
 **Emits**: <code>[notifications](#mbedConnector+event_notifications)</code>, <code>[registrations](#mbedConnector+event_registrations)</code>, <code>[reg-updates](#mbedConnector+event_reg-updates)</code>, <code>[de-registrations](#mbedConnector+event_de-registrations)</code>, <code>[registrations-expired](#mbedConnector+event_registrations-expired)</code>  
 
 * [mbedConnector](#mbedConnector)
-    * [new mbedConnector([options])](#new_mbedConnector_new)
+    * [new mbedConnector(options)](#new_mbedConnector_new)
     * [.getEndpoints(callback, [options])](#mbedConnector+getEndpoints)
     * [.getResources(endpoint, callback, [options])](#mbedConnector+getResources)
     * [.getResourceValue(endpoint, resource, callback, [options])](#mbedConnector+getResourceValue)
@@ -34,13 +34,16 @@
     * ["registrations-expired"](#mbedConnector+event_registrations-expired)
 
 <a name="new_mbedConnector_new"></a>
-### new mbedConnector([options])
+### new mbedConnector(options)
 Represents an mbed Connector REST API Client
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| [options] | <code>Object</code> | Optional options object |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>Object</code> |  | Options object |
+| options.accessKey | <code>string</code> |  | Access Key for your Connector account |
+| [options.host] | <code>string</code> | <code>&quot;https://api.connector.mbed.com&quot;</code> | URL for Connector API |
+| [options.restApiVersion] | <code>string</code> | <code>&quot;v2&quot;</code> | Version of Connector REST API to use |
 
 <a name="mbedConnector+getEndpoints"></a>
 ### mbedConnector.getEndpoints(callback, [options])
