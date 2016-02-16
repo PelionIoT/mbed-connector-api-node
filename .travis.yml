@@ -1,12 +1,13 @@
 language: node_js
 node_js:
   - stable
+python:
+  - "2.7"
+sudo: false
 install:
   - npm install
-  # Install all yotta dependencies if running integration tests
-  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then sudo apt-get update && sudo apt-get install python-setuptools cmake build-essential ninja-build python-dev libffi-dev libssl-dev && sudo easy_install pip; fi
   # Install yotta
-  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then sudo pip install yotta; fi
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then pip install --user yotta; fi
   - if [ $TRAVIS_PULL_REQUEST == "false" ]; then cmake --version; fi
 script:
   # If running integration tests, build an mbed linux client
@@ -24,3 +25,10 @@ addons:
       - cmake
       - cmake-data
       - g++-4.8
+      - python-setuptools
+      - cmake
+      - build-essential
+      - ninja-build
+      - python-dev
+      - libffi-dev
+      - libssl-dev
