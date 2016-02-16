@@ -14,6 +14,13 @@ var accessKey = process.env.ACCESS_KEY || 'DUMMY_KEY';
 var endpointName = process.env.ENDPOINT_NAME || 'DUMMY_ENDPOINT';
 var resourceName = process.env.RESOURCE_NAME || 'DUMMY/0/RESOURCE';
 var clientPath = process.env.CLIENT_PATH;
+var clientManagerDebug;
+
+if (process.env.CLIENT_MANAGER_DEBUG && process.env.CLIENT_MANAGER_DEBUG !== 'FALSE') {
+  clientManagerDebug = true;
+} else {
+  clientManagerDebug = false;
+}
 
 mbedConnector = new MbedConnector({
   host: host,
@@ -34,7 +41,9 @@ module.exports = function(mock, useCallback) {
         'Authorization': 'Bearer ' + accessKey
       }
     },
-    clientManager: new ClientManager(clientPath)
+    clientManager: new ClientManager(clientPath, {
+      printDebugOutput: clientManagerDebug
+    })
   };
 
   require('./general')(mbedConnector, config);
