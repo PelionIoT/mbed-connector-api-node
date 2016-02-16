@@ -8,7 +8,6 @@ install:
   - npm install
   # Install yotta
   - if [ $TRAVIS_PULL_REQUEST == "false" ]; then pip install --user yotta; fi
-  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then cmake --version; fi
 script:
   # If running integration tests, build an mbed linux client
   - if [ $TRAVIS_PULL_REQUEST == "false" ]; then ./test/ci/build_linux_client.sh; fi
