@@ -4,7 +4,7 @@ mkdir -p test/bin
 cd test/bin
 
 # Clone the mbed-client-linux-example
-git clone -b config-changes https://github.com/bridadan/mbed-client-linux-example.git
+git clone https://github.com/ARMmbed/mbed-client-linux-example.git
 cd mbed-client-linux-example
 
 # Replace the existing security.h with the unencrypted security.h
