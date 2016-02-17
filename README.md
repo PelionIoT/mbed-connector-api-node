@@ -1,3 +1,5 @@
+![build status](https://travis-ci.org/ARMmbed/mbed-connector-node.svg?branch=master)
+
 # mbed-connector
 
 Node.js library for talking to the mbed Device Connector Service
