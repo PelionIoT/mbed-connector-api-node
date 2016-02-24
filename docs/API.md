@@ -35,15 +35,15 @@
 
 <a name="new_mbedConnector_new"></a>
 ### new mbedConnector(options)
-Represents an mbed Connector REST API Client
+Represents an mbed Device Connector REST API Client
 
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  | Options object |
-| options.accessKey | <code>string</code> |  | Access Key for your Connector account |
-| [options.host] | <code>string</code> | <code>&quot;https://api.connector.mbed.com&quot;</code> | URL for Connector API |
-| [options.restApiVersion] | <code>string</code> | <code>&quot;v2&quot;</code> | Version of Connector REST API to use |
+| options.accessKey | <code>string</code> |  | Access Key for your mbed Device Connector account |
+| [options.host] | <code>string</code> | <code>&quot;https://api.connector.mbed.com&quot;</code> | URL for mbed Device Connector API |
+| [options.restApiVersion] | <code>string</code> | <code>&quot;v2&quot;</code> | Version of mbed Device Connector REST API to use |
 
 <a name="mbedConnector+getEndpoints"></a>
 ### mbedConnector.getEndpoints([callback], [options])
@@ -82,7 +82,7 @@ GETs the value of an endpoint's resource
 | [callback] | <code>function</code> |  | A function that is passed the arguments `(error, value)` where `value` is the value of the resource formatted as a string. |
 | [options] | <code>Object</code> |  | Optional options object |
 | [options.parameters.cacheOnly] | <code>boolean</code> | <code>false</code> | If `true`, the response will come only from the cache |
-| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
+| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, mbed Device Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
 
 <a name="mbedConnector+putResourceValue"></a>
 ### mbedConnector.putResourceValue(endpoint, resource, value, [callback], [options])
@@ -98,7 +98,7 @@ PUTs a value of an endpoint's resource
 | [callback] | <code>function</code> |  | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> |  | Optional options object |
 | [options.parameters.cacheOnly] | <code>boolean</code> | <code>false</code> | If `true`, the response will come only from the cache |
-| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
+| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, mbed Device Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
 
 <a name="mbedConnector+postResource"></a>
 ### mbedConnector.postResource(endpoint, resource, value, [callback], [options])
@@ -114,7 +114,7 @@ POSTs a value of an endpoint's resource
 | [callback] | <code>function</code> |  | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> |  | Optional options object |
 | [options.parameters.cacheOnly] | <code>boolean</code> | <code>false</code> | If `true`, the response will come only from the cache |
-| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
+| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, mbed Device Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
 
 <a name="mbedConnector+deleteEndpoint"></a>
 ### mbedConnector.deleteEndpoint(endpoint, [callback], [options])
@@ -128,11 +128,12 @@ DELETEs an endpoint
 | [callback] | <code>function</code> |  | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> |  | Optional options object |
 | [options.parameters.cacheOnly] | <code>boolean</code> | <code>false</code> | If `true`, the response will come only from the cache |
-| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
+| [options.parameters.noResp] | <code>boolean</code> | <code>false</code> | If `true`, mbed Device Connector will not wait for a response. Creates a CoAP Non-Confirmable requests. If `false`, a response is expected and the CoAP request is confirmable. |
 
 <a name="mbedConnector+getLimits"></a>
 ### mbedConnector.getLimits([callback], [options])
-Gets the current traffic usage and limits of the mbed Connector account
+Gets the current traffic usage and limits of the mbed Device Connector
+account
 
 **Kind**: instance method of <code>[mbedConnector](#mbedConnector)</code>  
 
@@ -154,7 +155,7 @@ Gets a list of the available REST API versions
 
 <a name="mbedConnector+getConnectorVersion"></a>
 ### mbedConnector.getConnectorVersion([callback], [options])
-Gets the current mbed Connector version
+Gets the current mbed Device Connector version
 
 **Kind**: instance method of <code>[mbedConnector](#mbedConnector)</code>  
 
@@ -184,14 +185,14 @@ PUTs callback data
 | --- | --- | --- |
 | data | <code>Object</code> | The callback data |
 | data.url | <code>string</code> | The callback URL |
-| [data.headers] | <code>Object</code> | The headers that should be set when Connector PUTs to the given callback URL |
+| [data.headers] | <code>Object</code> | The headers that should be set when mbed Device Connector PUTs to the given callback URL |
 | [callback] | <code>function</code> | A function that is passed a potential `error` object |
 | [options] | <code>Object</code> | Optional options object |
 
 <a name="mbedConnector+deleteCallback"></a>
 ### mbedConnector.deleteCallback([callback], [options])
-DELETEs the callback data (effectively stopping Connector from PUTing
-notifications)
+DELETEs the callback data (effectively stopping mbed Device Connector from
+PUTing notifications)
 
 **Kind**: instance method of <code>[mbedConnector](#mbedConnector)</code>  
 
