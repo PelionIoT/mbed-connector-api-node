@@ -169,22 +169,12 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should handle notifications', function(done) {
-        mbedConnector.on('notifications', function(notifications) {
-          var foundEndpoint = false;
-
-          assert(util.isArray(notifications));
-          assert(notifications.length > 0);
-
-          notifications.forEach(function(notification) {
-            if (notification.ep === config.endpointName && notification.path === config.resourceName) {
-              assert(notification.payload >= 0);
-              foundEndpoint = true;
-            }
-          });
-
-          assert(foundEndpoint);
-
-          done();
+        mbedConnector.on('notification', function(notification) {
+          if (notification.ep === config.endpointName &&
+              notification.path === config.resourceName) {
+            assert(notification.payload >= 0);
+            done();
+          }
         });
       });
     });
@@ -234,21 +224,10 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should handle registrations', function(done) {
-        mbedConnector.on('registrations', function(registrations) {
-          var foundEndpoint = false;
-
-          assert(util.isArray(registrations));
-          assert(registrations.length > 0);
-
-          registrations.forEach(function(registration) {
-            if (registration.ep === config.endpointName) {
-              foundEndpoint = true;
-            }
-          });
-
-          assert(foundEndpoint);
-
-          done();
+        mbedConnector.on('registration', function(registration) {
+          if (registration.ep === config.endpointName) {
+            done();
+          }
         });
 
         if (!config.mock) {
@@ -304,20 +283,9 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should handle reg-updates', function(done) {
-        mbedConnector.on('reg-updates', function(regUpdates) {
-          var foundEndpoint = false;
-
-          assert(util.isArray(regUpdates));
-          assert(regUpdates.length > 0);
-
-          regUpdates.forEach(function(regUpdate) {
-            if (regUpdate.ep === config.endpointName) {
-              foundEndpoint = true;
-            }
-          });
-
-          if (foundEndpoint) {
-            done();
+        mbedConnector.on('reg-update', function(regUpdate) {
+          if (regUpdate.ep === config.endpointName) {
+            done()
           }
         });
       });
@@ -372,11 +340,10 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should handle de-registrations', function(done) {
-        mbedConnector.on('de-registrations', function(deRegistrations) {
-          assert(util.isArray(deRegistrations));
-          assert(deRegistrations.length > 0);
-          assert(deRegistrations.indexOf(config.endpointName) > -1);
-          done();
+        mbedConnector.on('de-registration', function(endpoint) {
+          if (endpoint === config.endpointName) {
+            done();
+          }
         });
 
         if (!config.mock) {
@@ -434,11 +401,10 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should handle registrations-expired', function(done) {
-        mbedConnector.on('registrations-expired', function(registrationsExpired) {
-          assert(util.isArray(registrationsExpired));
-          assert(registrationsExpired.length > 0);
-          assert(registrationsExpired.indexOf(config.endpointName) > -1);
-          done();
+        mbedConnector.on('registration-expired', function(endpoint) {
+          if (endpoint === config.endpointName) {
+            done();
+          }
         });
 
         if (!config.mock) {
