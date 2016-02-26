@@ -15,5 +15,5 @@
  * limitations under the License.
  */
 
-// Test mbed Connector with the live API
+// Test mbed Device Connector with the live API
 require('./test-connector')(false, false);

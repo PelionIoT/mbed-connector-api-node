@@ -21,11 +21,11 @@ var assert = require('assert');
 var util = require('util');
 
 var ClientManager = require('./client-manager');
-var MbedConnector = require('../index');
+var MbedConnectorApi = require('../index');
 
 require('dotenv').load({silent: true});
 
-var mbedConnector;
+var mbedConnectorApi;
 var host = process.env.HOST || 'https://api.connector.mbed.com';
 var accessKey = process.env.ACCESS_KEY || 'DUMMY_KEY';
 var endpointName = process.env.ENDPOINT_NAME || 'DUMMY_ENDPOINT';
@@ -39,7 +39,7 @@ if (process.env.CLIENT_MANAGER_DEBUG && process.env.CLIENT_MANAGER_DEBUG !== 'FA
   clientManagerDebug = false;
 }
 
-mbedConnector = new MbedConnector({
+mbedConnectorApi = new MbedConnectorApi({
   host: host,
   accessKey: accessKey
 });
@@ -63,10 +63,10 @@ module.exports = function(mock, useCallback) {
     })
   };
 
-  require('./general')(mbedConnector, config);
-  require('./endpoints')(mbedConnector, config);
-  require('./notifications')(mbedConnector, config);
-  require('./subscriptions')(mbedConnector, config);
+  require('./general')(mbedConnectorApi, config);
+  require('./endpoints')(mbedConnectorApi, config);
+  require('./notifications')(mbedConnectorApi, config);
+  require('./subscriptions')(mbedConnectorApi, config);
 }
 
 

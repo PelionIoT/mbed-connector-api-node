@@ -14,6 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-// Test mbed Connector with the live API
+
+// Test mbed Device Connector with the live API
 require('./test-connector')(false, true);

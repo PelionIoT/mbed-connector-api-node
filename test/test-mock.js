@@ -15,5 +15,5 @@
  * limitations under the License.
  */
 
-// Test mbed Connector with the mocked API
+// Test mbed Device Connector with the mocked API
 require('./test-connector')(true);

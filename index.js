@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-module.exports = require('./lib/mbed-connector');
+module.exports = require('./lib/mbed-connector-api');

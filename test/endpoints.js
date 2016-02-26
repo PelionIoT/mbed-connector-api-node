@@ -22,14 +22,14 @@ var util = require('util');
 
 var MockHelper = require('./mock-helper');
 
-module.exports = function(mbedConnector, config) {
+module.exports = function(mbedConnectorApi, config) {
   describe('Endpoints', function() {
     if (!config.mock) {
       this.timeout(30000);
     }
 
     before(function(done) {
-      mbedConnector.removeAllListeners();
+      mbedConnectorApi.removeAllListeners();
 
       if (config.mock) {
         done();
@@ -39,7 +39,7 @@ module.exports = function(mbedConnector, config) {
     });
 
     after(function(done) {
-      mbedConnector.stopLongPolling();
+      mbedConnectorApi.stopLongPolling();
 
       if (config.mock) {
         done();
@@ -54,7 +54,7 @@ module.exports = function(mbedConnector, config) {
       before(function() {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .get(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints'))
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints'))
                     .reply(200, [
                       {
                         'name': config.endpointName,
@@ -66,7 +66,7 @@ module.exports = function(mbedConnector, config) {
       });
 
       it('should get endpoints', function(done) {
-        mbedConnector.getEndpoints(function(error, endpoints) {
+        mbedConnectorApi.getEndpoints(function(error, endpoints) {
           assert(!error);
           assert(util.isArray(endpoints));
           assert(endpoints.length > 0);
@@ -87,7 +87,7 @@ module.exports = function(mbedConnector, config) {
       before(function() {
         if (config.mock) {
           var mockApi = nock(config.host, config.nockConfig)
-                        .get(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName))
+                        .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
                         .reply(200, [
                           {
                             'uri': config.resourceName,
@@ -100,7 +100,7 @@ module.exports = function(mbedConnector, config) {
       });
 
       it("should get a list of an endpoint's resources", function(done) {
-        mbedConnector.getResources(config.endpointName, function(error, resources) {
+        mbedConnectorApi.getResources(config.endpointName, function(error, resources) {
           assert(!error);
           assert(util.isArray(resources));
           assert(resources.length > 0);
@@ -120,7 +120,7 @@ module.exports = function(mbedConnector, config) {
     });
 
     var getResourceValueTest = function(done){
-      mbedConnector.getResourceValue(config.endpointName, config.resourceName, function(error, value) {
+      mbedConnectorApi.getResourceValue(config.endpointName, config.resourceName, function(error, value) {
         assert(!error, String(error));
         assert(util.isString(value));
         assert(parseInt(value) >= 0);
@@ -134,17 +134,17 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .get(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                     .reply(200, 1);
 
           done();
         } else {
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         }
       });
 
       after(function() {
-        mbedConnector.stopLongPolling();
+        mbedConnectorApi.stopLongPolling();
       });
 
       it('should get a resource value', getResourceValueTest);
@@ -157,7 +157,7 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.get(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+          mockApi.get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                   .reply(202, function() {
                     setTimeout(function() {
                       longPollCb(null, [
@@ -180,21 +180,21 @@ module.exports = function(mbedConnector, config) {
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
                   .reply(204);
 
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
@@ -203,7 +203,7 @@ module.exports = function(mbedConnector, config) {
     }
 
     var putResourceValueTest = function(done) {
-      mbedConnector.putResourceValue(config.endpointName, config.resourceName, 1, function(error, value) {
+      mbedConnectorApi.putResourceValue(config.endpointName, config.resourceName, 1, function(error, value) {
         assert(!error, String(error));
         done();
       });
@@ -215,17 +215,17 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                     .reply(200);
 
           done();
         } else {
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         }
       });
 
       after(function() {
-        mbedConnector.stopLongPolling();
+        mbedConnectorApi.stopLongPolling();
       });
 
       it("should put a resource's value", putResourceValueTest);
@@ -238,7 +238,7 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.put(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+          mockApi.put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                   .reply(202, function() {
                     setTimeout(function() {
                       longPollCb(null, [
@@ -260,22 +260,22 @@ module.exports = function(mbedConnector, config) {
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
                   .reply(204);
 
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
@@ -285,7 +285,7 @@ module.exports = function(mbedConnector, config) {
 
     if (config.mock) {
       var postResourceTest = function(done) {
-        mbedConnector.postResource(config.endpointName, config.resourceName, null, function(error, value) {
+        mbedConnectorApi.postResource(config.endpointName, config.resourceName, null, function(error, value) {
           assert(!error, String(error));
           done();
         });
@@ -297,17 +297,17 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
-                      .post(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+                      .post(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                       .reply(200);
 
             done();
           } else {
-            mbedConnector.startLongPolling(done);
+            mbedConnectorApi.startLongPolling(done);
           }
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
         });
 
         it("should post a resource", postResourceTest);
@@ -319,7 +319,7 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.post(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
+          mockApi.post(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
                   .reply(202, function() {
                     setTimeout(function() {
                       longPollCb(null, [
@@ -341,22 +341,22 @@ module.exports = function(mbedConnector, config) {
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
                   .reply(204);
 
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
@@ -366,7 +366,7 @@ module.exports = function(mbedConnector, config) {
 
     if (config.mock) {
       var deleteEndpointTest = function(done) {
-        mbedConnector.deleteEndpoint(config.endpointName, function(error, value) {
+        mbedConnectorApi.deleteEndpoint(config.endpointName, function(error, value) {
           assert(!error, String(error));
           done();
         });
@@ -378,17 +378,17 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
-                      .delete(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName))
+                      .delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
                       .reply(200);
 
             done();
           } else {
-            mbedConnector.startLongPolling(done);
+            mbedConnectorApi.startLongPolling(done);
           }
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
         });
 
         it("should delete an endpoint", deleteEndpointTest);
@@ -400,7 +400,7 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.delete(urljoin('/', mbedConnector.options.restApiVersion, 'endpoints', config.endpointName))
+          mockApi.delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
                   .reply(202, function() {
                     setTimeout(function() {
                       longPollCb(null, [
@@ -422,22 +422,22 @@ module.exports = function(mbedConnector, config) {
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
                   .reply(204);
 
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
