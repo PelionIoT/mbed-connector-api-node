@@ -16,7 +16,7 @@
  */
 
 var child_process = require('child_process');
-extend = require('extend');
+var extend = require('extend');
 var pty = require('pty.js');
 
 var ClientManager = function(clientPath, options) {
