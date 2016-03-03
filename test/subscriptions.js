@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2013-2016, ARM Limited, All Rights Reserved
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var nock = require('nock');
 var urljoin = require('url-join');
 var assert = require('assert');
@@ -5,14 +22,14 @@ var util = require('util');
 
 var MockHelper = require('./mock-helper');
 
-module.exports = function(mbedConnector, config) {
+module.exports = function(mbedConnectorApi, config) {
   describe('Subscriptions', function() {
     if (!config.mock) {
       this.timeout(30000);
     }
 
     before(function(done) {
-      mbedConnector.removeAllListeners();
+      mbedConnectorApi.removeAllListeners();
       if (config.mock) {
         done();
       } else {
@@ -21,7 +38,7 @@ module.exports = function(mbedConnector, config) {
     });
 
     after(function(done) {
-      mbedConnector.stopLongPolling();
+      mbedConnectorApi.stopLongPolling();
       if (config.mock) {
         done();
       } else {
@@ -36,27 +53,27 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200)
-                    .get(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200);
 
-          mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+          mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
         } else {
-          mbedConnector.startLongPolling(function() {
-            mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+          mbedConnectorApi.startLongPolling(function() {
+            mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
           })
         }
       });
 
       if (!config.mock) {
         after(function(done) {
-          mbedConnector.deleteResourceSubscription(config.endpointName,config.resourceName, done);
+          mbedConnectorApi.deleteResourceSubscription(config.endpointName,config.resourceName, done);
         });
       }
 
       it("should get the subscription a resource", function(done) {
-        mbedConnector.getResourceSubscription(config.endpointName, config.resourceName, function(error, subscribed) {
+        mbedConnectorApi.getResourceSubscription(config.endpointName, config.resourceName, function(error, subscribed) {
           assert(!error, String(error));
           assert(subscribed);
           done();
@@ -65,7 +82,7 @@ module.exports = function(mbedConnector, config) {
     });
 
     var putResourceSubscriptionTest = function(done){
-      mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, function(error) {
+      mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, function(error) {
         assert(!error, String(error));
         done();
       });
@@ -77,12 +94,12 @@ module.exports = function(mbedConnector, config) {
       if (config.mock) {
         before(function() {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200);
         });
       } else {
         after(function(done) {
-          mbedConnector.deleteResourceSubscription(config.endpointName, config.resourceName, done);
+          mbedConnectorApi.deleteResourceSubscription(config.endpointName, config.resourceName, done);
         });
       }
 
@@ -96,7 +113,7 @@ module.exports = function(mbedConnector, config) {
         before(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
-          mockApi.put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+          mockApi.put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                   .reply(202, function() {
                     setTimeout(function() {
                       longPollCb(null, [
@@ -118,21 +135,21 @@ module.exports = function(mbedConnector, config) {
                   });
 
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: false })
                   .reply(function(uri, requestBody, cb) {
                     longPollCb = cb;
                   });
           mockApi.persist()
-                  .get(urljoin('/', mbedConnector.options.restApiVersion, 'notification', 'pull'))
+                  .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'notification', 'pull'))
                   .query({ noWait: true })
                   .reply(204);
 
-          mbedConnector.startLongPolling(done);
+          mbedConnectorApi.startLongPolling(done);
         });
 
         after(function() {
-          mbedConnector.stopLongPolling();
+          mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
@@ -147,17 +164,17 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200)
-                    .delete(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(204);
         }
 
-        mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+        mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
       });
 
       it("should delete a subscription to a resource", function(done) {
-        mbedConnector.deleteResourceSubscription(config.endpointName, config.resourceName, done);
+        mbedConnectorApi.deleteResourceSubscription(config.endpointName, config.resourceName, done);
       });
     });
 
@@ -167,23 +184,23 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200)
-                    .get(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName))
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName))
                     .reply(200, urljoin('/subscriptions', config.endpointName, config.resourceName));
         }
 
-        mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+        mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
       });
 
       if (!config.mock) {
         after(function(done) {
-          mbedConnector.deleteResourceSubscription(config.endpointName, config.resourceName, done);
+          mbedConnectorApi.deleteResourceSubscription(config.endpointName, config.resourceName, done);
         });
       }
 
       it("should get the subscription a resource", function(done) {
-        mbedConnector.getEndpointSubscriptions(config.endpointName, function(error, subscriptions) {
+        mbedConnectorApi.getEndpointSubscriptions(config.endpointName, function(error, subscriptions) {
           assert(!error, String(error));
           assert(util.isArray(subscriptions));
           assert.strictEqual(subscriptions.length, 1);
@@ -199,17 +216,17 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200)
-                    .delete(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName))
+                    .delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName))
                     .reply(204);
         }
 
-        mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+        mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
       });
 
       it("should delete all subscriptions for an endpoint", function(done) {
-        mbedConnector.deleteEndpointSubscriptions(config.endpointName, done);
+        mbedConnectorApi.deleteEndpointSubscriptions(config.endpointName, done);
       });
     });
 
@@ -219,17 +236,17 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions', config.endpointName, config.resourceName))
                     .reply(200)
-                    .delete(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions'))
+                    .delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions'))
                     .reply(204);
         }
 
-        mbedConnector.putResourceSubscription(config.endpointName, config.resourceName, done);
+        mbedConnectorApi.putResourceSubscription(config.endpointName, config.resourceName, done);
       });
 
       it("should delete all subscriptions for an endpoint", function(done) {
-        mbedConnector.deleteAllSubscriptions(done);
+        mbedConnectorApi.deleteAllSubscriptions(done);
       });
     });
 
@@ -247,7 +264,7 @@ module.exports = function(mbedConnector, config) {
       before(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions'))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions'))
                     .reply(function(uri, requestBody) {
                       if (util.isString(requestBody)) {
                         curPreSubscriptionData = JSON.parse(requestBody);
@@ -257,23 +274,23 @@ module.exports = function(mbedConnector, config) {
 
                       return [200, ''];
                     })
-                    .get(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions'))
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions'))
                     .reply(function(uri, requestBody) {
                       return [200, JSON.stringify(curPreSubscriptionData)];
                     });
         }
 
-        mbedConnector.putPreSubscription(preSubscriptionData, done);
+        mbedConnectorApi.putPreSubscription(preSubscriptionData, done);
       });
 
       if (!config.mock) {
         after(function(done) {
-          mbedConnector.putPreSubscription([], done);
+          mbedConnectorApi.putPreSubscription([], done);
         });
       }
 
       it("should get pre subscription data", function(done) {
-        mbedConnector.getPreSubscription(function(error, returnedPreSubscriptionData) {
+        mbedConnectorApi.getPreSubscription(function(error, returnedPreSubscriptionData) {
           assert(!error, String(error));
           assert.deepEqual(returnedPreSubscriptionData, preSubscriptionData);
           done();
@@ -293,7 +310,7 @@ module.exports = function(mbedConnector, config) {
       if (config.mock) {
         before(function() {
           mockApi = nock(config.host, config.nockConfig)
-                    .put(urljoin('/', mbedConnector.options.restApiVersion, 'subscriptions'))
+                    .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'subscriptions'))
                     .reply(function(uri, requestBody) {
                       try {
                         if (util.isString(requestBody)) {
@@ -302,9 +319,9 @@ module.exports = function(mbedConnector, config) {
                         assert.deepEqual(requestBody, preSubscriptionData);
                         return [200, ''];
                       } catch(e) {
-                        // Note: the body here does not mimic mbed Connector
-                        // This is intended to be a hint as to why the mocked
-                        // api test failed
+                        // Note: the body here does not mimic a mbed Device
+                        // Connector response. This is intended to be a hint as
+                        // to why the mocked api test failed
                         return [400, 'Incorrect data received'];
                       }
                     });
@@ -313,12 +330,12 @@ module.exports = function(mbedConnector, config) {
 
       if (!config.mock) {
         after(function(done) {
-          mbedConnector.putPreSubscription([], done);
+          mbedConnectorApi.putPreSubscription([], done);
         });
       }
 
       it("should put presubscription data", function(done) {
-        mbedConnector.putPreSubscription(preSubscriptionData, done);
+        mbedConnectorApi.putPreSubscription(preSubscriptionData, done);
       });
     });
   });

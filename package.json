@@ -1,11 +1,11 @@
 {
-  "name": "mbed-connector",
-  "version": "1.2.1",
-  "description": "Node.js wrapper for mbed Connector REST calls",
+  "name": "mbed-connector-api",
+  "version": "2.0.0",
+  "description": "Node.js wrapper for mbed Device Connector REST calls",
   "main": "index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ARMmbed/mbed-connector-node.git"
+    "url": "https://github.com/ARMmbed/mbed-connector-api-node.git"
   },
   "author": {
     "name": "Brian Daniels",
