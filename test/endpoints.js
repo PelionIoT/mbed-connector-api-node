@@ -51,10 +51,20 @@ module.exports = function(mbedConnectorApi, config) {
     describe('#getEndpoints', function() {
       var mockApi;
 
-      before(function() {
+      beforeEach(function() {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
                     .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints'))
+                    .reply(200, [
+                      {
+                        'name': config.endpointName,
+                        'type': 'test',
+                        'status': 'ACTIVE'
+                      }
+                    ]);
+
+          nock(config.host, config.nockConfig)
+                    .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints') + '?type=test')
                     .reply(200, [
                       {
                         'name': config.endpointName,
@@ -77,6 +87,78 @@ module.exports = function(mbedConnectorApi, config) {
 
           assert(testEndpointMatches.length > 0);
           done();
+        });
+      });
+
+      it('should get endpoints - options at the end', function(done) {
+        mbedConnectorApi.getEndpoints(function(error, endpoints) {
+          assert(!error);
+          assert(util.isArray(endpoints));
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
+          done();
+        }, { parameters: { type: 'test' } });
+      });
+
+      it('should get endpoints - options at the beginning', function(done) {
+        mbedConnectorApi.getEndpoints({ parameters: { type: 'test' } }, function(error, endpoints) {
+          assert(!error);
+          assert(util.isArray(endpoints));
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
+          done();
+        });
+      });
+
+      it('should get endpoints - promises', function(done) {
+        var promise = mbedConnectorApi.getEndpoints();
+
+        assert(promise.then, 'should have then property');
+        assert(promise.catch, 'should have catch property');
+
+        promise.then(function(endpoints) {
+          assert(util.isArray(endpoints));
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
+          done();
+        }).catch(function(error) {
+          assert(!error);
+        });
+      });
+
+      it('should get endpoints - promises - with options', function(done) {
+        var promise = mbedConnectorApi.getEndpoints('test');
+
+        assert(promise.then, 'should have then property');
+        assert(promise.catch, 'should have catch property');
+
+        promise.then(function(endpoints) {
+          assert(util.isArray(endpoints));
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
+          done();
+        }).catch(function(error) {
+          assert(!error);
         });
       });
     });
