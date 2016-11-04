@@ -28,7 +28,7 @@ module.exports = function(mbedConnectorApi, config) {
       this.timeout(30000);
     }
 
-    before(function(done) {
+    beforeEach(function(done) {
       mbedConnectorApi.removeAllListeners();
 
       if (config.mock) {
@@ -38,7 +38,7 @@ module.exports = function(mbedConnectorApi, config) {
       }
     });
 
-    after(function(done) {
+    afterEach(function(done) {
       mbedConnectorApi.stopLongPolling();
 
       if (config.mock) {
@@ -120,6 +120,21 @@ module.exports = function(mbedConnectorApi, config) {
         });
       });
 
+      it('should get endpoints - string at the beginning', function(done) {
+        mbedConnectorApi.getEndpoints('test', function(error, endpoints) {
+          assert(!error);
+          assert(util.isArray(endpoints));
+          assert(endpoints.length > 0);
+
+          var testEndpointMatches = endpoints.filter(function(endpoint) {
+            return endpoint.name === config.endpointName;
+          });
+
+          assert(testEndpointMatches.length > 0);
+          done();
+        });
+      });
+
       it('should get endpoints - promises', function(done) {
         var promise = mbedConnectorApi.getEndpoints();
 
@@ -166,7 +181,7 @@ module.exports = function(mbedConnectorApi, config) {
     describe('#getResources', function() {
       var mockApi;
 
-      before(function() {
+      beforeEach(function() {
         if (config.mock) {
           var mockApi = nock(config.host, config.nockConfig)
                         .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
@@ -199,6 +214,16 @@ module.exports = function(mbedConnectorApi, config) {
           done();
         });
       });
+
+      it("should allow passing in an object as first arg", function(done) {
+        mbedConnectorApi.getResources({ name: config.endpointName }, function(error, resources) {
+          assert(!error);
+          assert(util.isArray(resources));
+          assert(resources.length > 0);
+
+          done();
+        });
+      });
     });
 
     var getResourceValueTest = function(done){
@@ -210,10 +235,19 @@ module.exports = function(mbedConnectorApi, config) {
       });
     };
 
+    var getResourceValueTestWithObject = function(done){
+      mbedConnectorApi.getResourceValue({ name: config.endpointName }, config.resourceName, function(error, value) {
+        assert(!error, String(error));
+        assert(util.isString(value));
+        assert(parseInt(value) >= 0);
+        done();
+      });
+    };
+
     describe('#getResourceValue', function() {
       var mockApi;
 
-      before(function(done) {
+      beforeEach(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
                     .get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -225,18 +259,19 @@ module.exports = function(mbedConnectorApi, config) {
         }
       });
 
-      after(function() {
+      afterEach(function() {
         mbedConnectorApi.stopLongPolling();
       });
 
       it('should get a resource value', getResourceValueTest);
+      it('should get a resource value w/ object as first arg', getResourceValueTestWithObject);
     });
 
     if (config.mock) {
       describe('#getResourceValue (async-response)', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.get(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -275,12 +310,14 @@ module.exports = function(mbedConnectorApi, config) {
           mbedConnectorApi.startLongPolling(done);
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
         it('should get a resource value (after first receiving an async response)', getResourceValueTest);
+        it('should get a resource value with object as first arg (after first receiving an async response)',
+          getResourceValueTestWithObject);
       });
     }
 
@@ -291,10 +328,17 @@ module.exports = function(mbedConnectorApi, config) {
       });
     };
 
+    var putResourceValueTestWithObject = function(done) {
+      mbedConnectorApi.putResourceValue({ name: config.endpointName }, config.resourceName, 1, function(error, value) {
+        assert(!error, String(error));
+        done();
+      });
+    };
+
     describe('#putResourceValue', function() {
       var mockApi;
 
-      before(function(done) {
+      beforeEach(function(done) {
         if (config.mock) {
           mockApi = nock(config.host, config.nockConfig)
                     .put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -306,18 +350,19 @@ module.exports = function(mbedConnectorApi, config) {
         }
       });
 
-      after(function() {
+      afterEach(function() {
         mbedConnectorApi.stopLongPolling();
       });
 
       it("should put a resource's value", putResourceValueTest);
+      it("should put a resource's value with object as first arg", putResourceValueTestWithObject);
     });
 
     if (config.mock) {
       describe('#putResourceValue (async-response)', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.put(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -356,12 +401,14 @@ module.exports = function(mbedConnectorApi, config) {
           mbedConnectorApi.startLongPolling(done);
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
         it("should put a resource's value (after first receiving an async response)", putResourceValueTest);
+        it("should put a resource's value with object as first arg (after first receiving an async response)",
+          putResourceValueTestWithObject);
       });
     }
 
@@ -373,10 +420,17 @@ module.exports = function(mbedConnectorApi, config) {
         });
       };
 
+      var postResourceTestWithObject = function(done) {
+        mbedConnectorApi.postResource({ name: config.endpointName }, config.resourceName, null, function(error, value) {
+          assert(!error, String(error));
+          done();
+        });
+      };
+
       describe('#postResource', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
                       .post(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -388,17 +442,18 @@ module.exports = function(mbedConnectorApi, config) {
           }
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
         });
 
         it("should post a resource", postResourceTest);
+        it("should post a resource with object as first arg", postResourceTestWithObject);
       });
 
       describe('#postResource (async-response)', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.post(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName, config.resourceName))
@@ -437,12 +492,13 @@ module.exports = function(mbedConnectorApi, config) {
           mbedConnectorApi.startLongPolling(done);
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
         it("should post a resource (after first receiving an async response)", postResourceTest);
+        it("should post a resource with object as first arg (after first receiving an async response)", postResourceTestWithObject);
       });
     }
 
@@ -454,10 +510,17 @@ module.exports = function(mbedConnectorApi, config) {
         });
       };
 
+      var deleteEndpointTestWithObject = function(done) {
+        mbedConnectorApi.deleteEndpoint({ name: config.endpointName }, function(error, value) {
+          assert(!error, String(error));
+          done();
+        });
+      };
+
       describe('#deleteEndpoint', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           if (config.mock) {
             mockApi = nock(config.host, config.nockConfig)
                       .delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
@@ -469,17 +532,18 @@ module.exports = function(mbedConnectorApi, config) {
           }
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
         });
 
         it("should delete an endpoint", deleteEndpointTest);
+        it("should delete an endpoint with object as first arg", deleteEndpointTestWithObject);
       });
 
       describe('#deleteEndpoint (async-response)', function() {
         var mockApi;
 
-        before(function(done) {
+        beforeEach(function(done) {
           var longPollCb;
           mockApi = MockHelper.createLongPollInstance(config.host, config.nockConfig);
           mockApi.delete(urljoin('/', mbedConnectorApi.options.restApiVersion, 'endpoints', config.endpointName))
@@ -518,12 +582,14 @@ module.exports = function(mbedConnectorApi, config) {
           mbedConnectorApi.startLongPolling(done);
         });
 
-        after(function() {
+        afterEach(function() {
           mbedConnectorApi.stopLongPolling();
           nock.cleanAll();
         });
 
         it("should delete and endpoint (after first receiving an async response)", deleteEndpointTest);
+        it("should delete and endpoint with object as first arg (after first receiving an async response)",
+          deleteEndpointTestWithObject);
       });
     }
 
