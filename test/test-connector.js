@@ -44,6 +44,18 @@ mbedConnectorApi = new MbedConnectorApi({
   accessKey: accessKey
 });
 
+describe('mbedConnectorApi constructor', function() {
+  it('Should take an object as first argument', function() {
+    var a = new MbedConnectorApi({ accessKey: 'hoi' });
+    assert.equal(a.options.accessKey, 'hoi');
+  });
+  
+  it('Should also take string as first argument', function() {
+    var a = new MbedConnectorApi('hoi');
+    assert.equal(a.options.accessKey, 'hoi');
+  });
+});
+
 module.exports = function(mock, useCallback) {
   var config = {
     mock: mock,
