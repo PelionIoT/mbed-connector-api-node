@@ -1,6 +1,6 @@
 {
   "name": "mbed-connector-api",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Node.js wrapper for mbed Device Connector REST calls",
   "main": "index",
   "repository": {
