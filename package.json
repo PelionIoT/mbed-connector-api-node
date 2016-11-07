@@ -18,6 +18,7 @@
     "docs": "jsdoc2md \"lib/**/*.js\" > docs/API.md"
   },
   "dependencies": {
+    "es6-promisify": "^5.0.0",
     "extend": "^3.0.0",
     "request": "^2.34.0",
     "url-join": "0.0.1"

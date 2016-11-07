@@ -96,25 +96,5 @@ module.exports = function(mbedConnectorApi, config) {
         });
       });
     });
-
-    describe('#getConnectorVersion', function() {
-      var mockApi;
-
-      before(function() {
-        if (config.mock) {
-          mockApi = nock(config.host, config.nockConfig)
-                    .get('/')
-                    .reply(200, 'DeviceServer v3.0.0-520\nREST version = v2');
-        }
-      });
-
-      it('should get the current Connector version', function(done) {
-        mbedConnectorApi.getConnectorVersion(function(error, connectorVersion) {
-          assert(!error, String(error));
-          assert(util.isString(connectorVersion));
-          done();
-        });
-      });
-    });
   });
 };
