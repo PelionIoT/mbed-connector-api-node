@@ -19,7 +19,7 @@
     * [.deleteCallback([options], [callback])](#mbedConnectorApi+deleteCallback)
     * [.startLongPolling([options], [callback])](#mbedConnectorApi+startLongPolling)
     * [.stopLongPolling()](#mbedConnectorApi+stopLongPolling)
-    * [.handleNotifications([payload])](#mbedConnectorApi+handleNotifications)
+    * [.handleNotifications(payload)](#mbedConnectorApi+handleNotifications)
     * [.getResourceSubscription(endpoint, resource, [options], [callback])](#mbedConnectorApi+getResourceSubscription)
     * [.putResourceSubscription(endpoint, resource, [callback], [options])](#mbedConnectorApi+putResourceSubscription)
     * [.deleteResourceSubscription(endpoint, resource, [options], [callback])](#mbedConnectorApi+deleteResourceSubscription)
@@ -223,14 +223,14 @@ Stops long polling for notifications
 **Kind**: instance method of <code>[mbedConnectorApi](#mbedConnectorApi)</code>  
 <a name="mbedConnectorApi+handleNotifications"></a>
 
-### mbedConnectorApi.handleNotifications([payload])
-Parse a JSON payload from a push notification
+### mbedConnectorApi.handleNotifications(payload)
+Parse a JSON payload from a notification
 
 **Kind**: instance method of <code>[mbedConnectorApi](#mbedConnectorApi)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [payload] | <code>Object</code> | The payload object from a push notification |
+| payload | <code>Object</code> | The payload object from a notification |
 
 <a name="mbedConnectorApi+getResourceSubscription"></a>
 
