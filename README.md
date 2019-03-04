@@ -1,5 +1,9 @@
 ![build status](https://travis-ci.org/ARMmbed/mbed-connector-api-node.svg?branch=master)
 
+# DEPRECATED
+
+This project has been succeeded by https://github.com/ARMmbed/mbed-cloud-sdk-javascript.
+
 # mbed-connector-api
 
 Node.js library for talking to the mbed Device Connector Service
@@ -120,5 +124,3 @@ Running these tests require a number of environment variables to be setup. These
 The following variables are also available for optional configuration:
 
 - HOST - The URL to the mbed Device Connector API. Defaults to `https://api.connector.mbed.com`.
-
-
