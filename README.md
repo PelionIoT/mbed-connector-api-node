@@ -66,7 +66,6 @@ var MbedConnectorApi = require('mbed-connector-api');
 var mbedConnectorApi = new MbedConnectorApi({
   accessKey: /* Access Key */
 });
-
 // Setup notification channel
 mbedConnectorApi.startLongPolling(function(error) {
   if (error) throw error;
@@ -84,6 +83,36 @@ mbedConnectorApi.startLongPolling(function(error) {
         });
       });
     });
+  });
+});
+```
+
+### Setup callback notifications with Express 4.x
+
+**NOTE**: This example requires the `express` and `body-parser` packages in addition to the `mbed-connector-api` package (`npm install express body-parser`).
+
+```javascript
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var MbedConnectorApi = require('mbed-connector-api');
+var mbedConnectorApi = new MbedConnectorApi({
+  accessKey: /* Access Key */
+});
+app.use(bodyParser.json());
+app.put('/webhook', function (req, res) {
+  if (req.body) mbedConnectorApi.handleNotifications(req.body);
+  res.sendStatus(200);
+});
+// Start the express app
+app.listen(3000, function() {
+  console.log('Express app listening on port 3000');
+  // Setup notification channel
+  mbedConnectorApi.putCallback({
+    url: 'http://mywebapp.com/webhook'
+  }, function(error) {
+    if (error) throw error;
+    console.log('Listening for callback notifications...');
   });
 });
 ```
